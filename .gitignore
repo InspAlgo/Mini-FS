@@ -1,3 +1,12 @@
+# MiniFS VS Project
+MiniFS/.vs/*
+MiniFS/Debug/*
+MiniFS/Release/*
+MiniFS/x64/*
+MiniFS/MiniFS/Debug/*
+MiniFS/MiniFS/Release/*
+MiniFS/MiniFS/x64/*
+
 # Prerequisites
 *.d
 
