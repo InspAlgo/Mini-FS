@@ -14,6 +14,13 @@
 #include <cassert>
 #include <Windows.h>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <regex>
+
 #include "mfs_define.h"
 #include "mfs_algorithm.h"
 #include "mfs_coresystem.h"
