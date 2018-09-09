@@ -1,6 +1,13 @@
-# VS project Template
-.vs  
-
+# Mini-FS VS project
+MiniFS/.vs/*
+MiniFS/Debug/*
+MiniFS/Release/*
+MiniFS/x64/*
+.vs/*
+MiniFS/MiniFS/Debug/*
+MiniFS/MiniFS/Release/*
+MiniFS/MiniFS/Debug/*
+MiniFS/MiniFS/x64/*
 
 # Prerequisites
 *.d

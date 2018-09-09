@@ -10,10 +10,10 @@
 
 #include "mini_file_system.h"
 
-
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
 	// 创建文件变量
-	while (1);
+	while (1)
+		;
 	return 0;
 }
