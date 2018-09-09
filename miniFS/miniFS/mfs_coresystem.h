@@ -38,6 +38,7 @@ private:
 	inline void	writeCluster(const uint_32 cluster) const;
 	Directory	readDirectory(const uint_32 dir_entrance) const;
 	void		rewriteDirectory(const Directory dir) const;
+	void		newWriteDirectory(const Directory dir) const;
 
 private:
 	int		createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);	// 创建空间
@@ -51,11 +52,13 @@ private:
 	int		displayFile(char filename[]);
 	int		moreDisplayFile(char filename[]);
 	int		showAttribute(char filename[]);
-	int		showHelp(int mode = 0);
-
 	// 拓展功能
 	int		makeDir(char filename[]);
 	// 创建文件 编辑文件
+
+
+
+	int		showHelp(int mode = 0);
 };
 
 
