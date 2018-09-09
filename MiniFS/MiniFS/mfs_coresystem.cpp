@@ -185,7 +185,7 @@ int MiniFS::cmd(void) {
     {
         if (command_num == 2)
         {
-            // 判断 filename 的合法性
+            // 判断 filename 的合法性 
             std::cout << command_vector[1] << std::endl;
         }
         else
