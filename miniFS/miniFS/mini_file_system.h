@@ -16,9 +16,9 @@
 #define __MINI_FILE_SYSTEM_H__
 
 
-#include <time.h>
+#include <ctime>
 #include <cassert>
-#include <stdio.h>
+#include <cstdio>
 #include <cmath>
 #include <vector>
 
