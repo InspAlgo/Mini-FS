@@ -71,3 +71,17 @@ uint_32	MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
