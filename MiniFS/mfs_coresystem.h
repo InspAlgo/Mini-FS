@@ -25,8 +25,19 @@ public:
 	MiniFS();
 	~MiniFS();
 
-	int		cmd(void);				// 输入处理 
+//	命令解析模块			<mfs_cs_cmd.cpp>
+public:
+	int			cmd(void);
+private:
+	inline void	printFilePath(void);
 
+
+//	帮助系统模块			<mfs_cs_help.cpp>
+private:
+	void		showHelp(int mode = 0);
+
+
+//	硬盘读写模块			<mfs_cs_diskio.cpp>
 private:
 	inline void	readMBR(void);
 	inline void	writeMBR(void) const;
@@ -38,24 +49,27 @@ private:
 	inline void	writeCluster(const uint_32 cluster) const;
 	Directory	readDirectory(const uint_32 dir_entrance) const;
 	void		rewriteDirectory(const Directory dir) const;
+	void		newWriteDirectory(const Directory dir) const;
 
+
+//	空间操作模块			<mfs_cs_spaceop.cpp>
 private:
-	int		createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);	// 创建空间
-	int		mountSpace(char name[]);
-	int		formatSpace(uint_32 cluster_size = 4);
-	int		closeSpace(void);
+	int			createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);
+	int			mountSpace(char name[]);
+	int			formatSpace(uint_32 cluster_size = 4);
+	int			closeSpace(void);
 
-	int		showDirectory(void);
-	int		copyFile(char filename_1[], char filename_2[], int mode);
-	int		deleteFile(char filename[]);
-	int		displayFile(char filename[]);
-	int		moreDisplayFile(char filename[]);
-	int		showAttribute(char filename[]);
-	int		showHelp(int mode = 0);
 
-	// 拓展功能
-	int		makeDir(char filename[]);
-	// 创建文件 编辑文件
+//	文件操作模块			<mfs_cs_fileop.cpp>
+private:
+	int			showDirectory(void);
+	int			copyFile(char filename_1[], char filename_2[], int mode);
+	int			deleteFile(char filename[]);
+	int			displayFile(char filename[]);
+	int			moreDisplayFile(char filename[]);
+	int			showAttribute(char filename[]);
+	int			makeDir(char filename[]);
+	int			createFile(char filename[]);
 };
 
 

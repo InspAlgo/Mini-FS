@@ -8,6 +8,10 @@ MiniFS/MiniFS/Debug/*
 MiniFS/MiniFS/Release/*
 MiniFS/MiniFS/Debug/*
 MiniFS/MiniFS/x64/*
+.gitignore_BACKUP_912
+.gitignore_BASE_912
+.gitignore_LOCAL_912
+.gitignore_REMOTE_912
 
 # Prerequisites
 *.d
