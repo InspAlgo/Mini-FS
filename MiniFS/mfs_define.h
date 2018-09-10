@@ -16,10 +16,18 @@ typedef signed short int_16;
 typedef signed int int_32;
 typedef signed long long int_64;
 
+typedef signed char int_8;
+typedef signed short int_16;
+typedef signed int int_32;
+typedef signed long long int_64;
+
 typedef unsigned char uint_8;
 typedef unsigned short uint_16;
 typedef unsigned int uint_32;
 typedef unsigned long long uint_64;
+
+/// FAT表文件终止标记 (End Cluster Of File)
+#define ECOF (0xffffffff)
 
 ///	主引导记录 (Main Boot Record)											[64B]
 struct MBR
@@ -83,12 +91,12 @@ union DFC {
 	{
 		DFH header;
 		FCB fcb[1023];
-	} firstclu; // 目录文件第一簇
+	} firstclu; // 目录文件第一簇					[64KB]
 
 	struct
 	{
 		FCB fcb[1024];
-	} otherclu; // 目录文件其它簇
+	} otherclu; // 目录文件其它簇					[64KB]
 };
 
 // 静态断言:
