@@ -1,4 +1,4 @@
-//
+﻿//
 //	mfs_coresystem.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.

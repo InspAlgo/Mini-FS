@@ -1,35 +1,35 @@
-//
+ï»¿//
 //	mfs_cs_spaceop.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	Class MiniFS: This file implements rewriting control information of space.
 //
-
+#pragma warning(disable:4996)
 #include "mini_file_system.h"
 
 
-/// <summary> ´´½¨¿Õ¼ä </summary>
-/// <return> -1:¿Õ¼äÃûÖØ¸´; 1:´´½¨³É¹¦ </return>
+/// <summary> åˆ›å»ºç©ºé—´ </summary>
+/// <return> -1:ç©ºé—´åé‡å¤; 1:åˆ›å»ºæˆåŠŸ </return>
 int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 {
-	// ÅĞ¶Ï´ËÎ»ÖÃÊÇ·ñÓĞÍ¬ÃûÎÄ¼ş
+	// åˆ¤æ–­æ­¤ä½ç½®æ˜¯å¦æœ‰åŒåæ–‡ä»¶
 	FILE * fp = fopen(name, "r");
 	if (fp != NULL) {
 		fclose(fp);
 		return -1;
 	}
 
-	// ´´½¨¿Õ¼ä
+	// åˆ›å»ºç©ºé—´
 	space_fp = fopen(name, "wb+");
 	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_SET);
 	fwrite("\0", 1, 1, space_fp);
 	fclose(space_fp);
 
-	// ³õÊ¼»¯¿Õ¼äĞÅÏ¢
+	// åˆå§‹åŒ–ç©ºé—´ä¿¡æ¯
 	space_fp = fopen(name, "rb+");
 
-	// Ğ´Èëmbr
+	// å†™å…¥mbr
 	strcpy(mbr.space_name, name);
 	mbr.space_size = space_size;
 	mbr.cluster_size = cluster_size;
@@ -39,10 +39,10 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
 	mbr.create_time = time(NULL);
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
-	// MBRĞ´»ØÓ²ÅÌ
+	// MBRå†™å›ç¡¬ç›˜
 	writeMBR();
 
-	// ÖØĞÂ¿ª±ÙCABÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
+	// é‡æ–°å¼€è¾ŸCABå†…å­˜ç©ºé—´å¹¶å†™å›
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	for (uint_32 i = 0; i <= mbr.RDF_entrance; i++) {
@@ -51,7 +51,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	writeCAB();
 	free(CAB);
 
-	// ÖØĞÂ¿ª±ÙFATÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
+	// é‡æ–°å¼€è¾ŸFATå†…å­˜ç©ºé—´å¹¶å†™å›
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
 	FAT[0] = ECOF;
 	for (uint_32 i = mbr.CAB_entrance; i < mbr.FAT_entrance - 1; i++) {
@@ -66,7 +66,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	writeFAT();
 	free(FAT);
 
-	// ĞÂ½¨¸ùÄ¿Â¼ÎÄ¼ş²¢Ğ´ÈëÓ²ÅÌ
+	// æ–°å»ºæ ¹ç›®å½•æ–‡ä»¶å¹¶å†™å…¥ç¡¬ç›˜
 	Directory creat_directory;
 	strcpy(creat_directory.header.name, mbr.space_name);
 	creat_directory.header.occupy_cluster_num = 1;
@@ -85,8 +85,8 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	return 1;
 }
 
-/// <summary> ´ò¿ª¿Õ¼ä </summary>
-/// <return> -1:´ò¿ªÊ§°Ü; 1:´ò¿ª³É¹¦ </return>
+/// <summary> æ‰“å¼€ç©ºé—´ </summary>
+/// <return> -1:æ‰“å¼€å¤±è´¥; 1:æ‰“å¼€æˆåŠŸ </return>
 int MiniFS::mountSpace(char name[])
 {
 	space_fp = fopen(name, "r");
@@ -105,37 +105,37 @@ int MiniFS::mountSpace(char name[])
 	return 1;
 }
 
-/// <summary> ¸ñÊ½»¯¿Õ¼ä </summary>
-/// <param name="cluster_size"> ÎÄ¼şÏµÍ³µ¥´Ø´óĞ¡ </param>
-/// <return> 1:¸ñÊ½»¯³É¹¦; -1:¸ñÊ½»¯Ê§°Ü </return>
+/// <summary> æ ¼å¼åŒ–ç©ºé—´ </summary>
+/// <param name="cluster_size"> æ–‡ä»¶ç³»ç»Ÿå•ç°‡å¤§å° </param>
+/// <return> 1:æ ¼å¼åŒ–æˆåŠŸ; -1:æ ¼å¼åŒ–å¤±è´¥ </return>
 int MiniFS::formatSpace(uint_32 cluster_size)
 {
-	// ¸ÄĞ´MBR
+	// æ”¹å†™MBR
 	mbr.cluster_size = cluster_size;
 	mbr.cluster_num = mbr.space_size * 1024 / mbr.cluster_size;
 	mbr.CAB_entrance = 1;
-	// CABÎÄ¼şÕ¼ÓÃ´ØÊı Îª ¡¾ ´ØÊı / µ¥´Ø´óĞ¡(KB) / 8192 ¡¿
+	// CABæ–‡ä»¶å ç”¨ç°‡æ•° ä¸º ã€ ç°‡æ•° / å•ç°‡å¤§å°(KB) / 8192 ã€‘
 	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0*mbr.cluster_size));
-	// FATÎÄ¼şÕ¼ÓÃ´ØÊı Îª ¡¾ ´ØÊı / µ¥´Ø´óĞ¡(KB) / 256 ¡¿
+	// FATæ–‡ä»¶å ç”¨ç°‡æ•° ä¸º ã€ ç°‡æ•° / å•ç°‡å¤§å°(KB) / 256 ã€‘
 	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
 
-	// MBRĞ´»ØÓ²ÅÌ
+	// MBRå†™å›ç¡¬ç›˜
 	writeMBR();
 
-	// ÖØĞÂ¿ª±ÙCABÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
+	// é‡æ–°å¼€è¾ŸCABå†…å­˜ç©ºé—´å¹¶å†™å›
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 
 	free(CAB);
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	writeCAB();
 
-	// ÖØĞÂ¿ª±ÙFATÄÚ´æ¿Õ¼ä
+	// é‡æ–°å¼€è¾ŸFATå†…å­˜ç©ºé—´
 	free(FAT);
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
 	writeFAT();
 
-	// Çå¿ÕÎÄ¼şÄ¿Â¼²¢½«¸ùÄ¿Â¼ÎÄ¼şĞ´»Ø
+	// æ¸…ç©ºæ–‡ä»¶ç›®å½•å¹¶å°†æ ¹ç›®å½•æ–‡ä»¶å†™å›
 	directory.clear();
 	Directory format_directory;
 	strcpy(format_directory.header.name, mbr.space_name);
@@ -151,7 +151,7 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	directory.push_back(format_directory);
 	free(format_directory.fcb);
 
-	// ¸ÄĞ´ÎÄ¼ş»º³åÇø´óĞ¡
+	// æ”¹å†™æ–‡ä»¶ç¼“å†²åŒºå¤§å°
 	buffer = realloc(buffer, mbr.cluster_size * 1024);
 
 	return 1;

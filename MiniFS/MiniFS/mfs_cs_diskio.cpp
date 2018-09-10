@@ -1,4 +1,4 @@
-//
+ï»¿//
 //	mfs_cs_diskio.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -9,74 +9,19 @@
 #include "mini_file_system.h"
 
 
-/// <summary> ½«Ó²ÅÌÖĞµÄMBRĞÅÏ¢¶ÁÈëÄÚ´æmbrÖĞ </summary>
-inline void MiniFS::readMBR(void)
-{
-	fseek(space_fp, 0L, SEEK_SET);
-	fread(&mbr, sizeof(MBR), 1, space_fp);
-}
 
-/// <summary> ½«ÄÚ´æÖĞµÄmbrĞÅÏ¢Ğ´»ØÓ²ÅÌ </summary>
-inline void MiniFS::writeMBR(void) const
-{
-	fseek(space_fp, 0L, SEEK_SET);
-	fwrite(&mbr, sizeof(MBR), 1, space_fp);
-}
 
-/// <summary> ½«Ó²ÅÌÖĞµÄCABĞÅÏ¢¶ÁÈëÄÚ´æCABÖĞ </summary>
-inline void MiniFS::readCAB(void)
-{
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
-	fread(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
-}
-
-/// <summary> ½«ÄÚ´æÖĞµÄCABĞÅÏ¢Ğ´»ØÓ²ÅÌ </summary>
-inline void MiniFS::writeCAB(void) const
-{
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
-	fwrite(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
-}
-
-/// <summary> ½«Ó²ÅÌÖĞµÄFATĞÅÏ¢¶ÁÈëÄÚ´æFATÖĞ </summary>
-inline void MiniFS::readFAT(void)
-{
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
-	fread(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
-}
-
-/// <summary> ½«ÄÚ´æÖĞµÄFATĞÅÏ¢Ğ´»ØÓ²ÅÌ </summary>
-inline void MiniFS::writeFAT(void) const
-{
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
-	fwrite(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
-}
-
-/// <summary> ½«Ó²ÅÌÖĞÖ¸¶¨´ØºÅµÄĞÅÏ¢¶ÁÈëbuffer </summary>
-/// <param name="cluster"> Ö¸¶¨´ØºÅ </param>
-inline void MiniFS::readCluster(const uint_32 cluster)
-{
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
-	fread(buffer, mbr.cluster_size * 1024, 1, space_fp);
-}
-
-/// <summary> ½«bufferÖĞµÄÄÚÈİĞ´»ØÓ²ÅÌÖ¸¶¨´ØºÅ </summary>
-inline void MiniFS::writeCluster(const uint_32 cluster) const
-{
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
-	fwrite(buffer, mbr.cluster_size * 1024, 1, space_fp);
-}
-
-/// <summary> ¶ÁÈ¡Ó²ÅÌÄ¿Â¼ÎÄ¼ş²¢¼ÓÔØµ½ÄÚ´æÖĞ </summary>
-/// <param name="dir_entrance"> Ö¸¶¨Ä¿Â¼ÎÄ¼şÓ²ÅÌÈë¿Ú´ØºÅ </param>
-/// <return> ÄÚ´æÄ¿Â¼½á¹¹ </return>
+/// <summary> è¯»å–ç¡¬ç›˜ç›®å½•æ–‡ä»¶å¹¶åŠ è½½åˆ°å†…å­˜ä¸­ </summary>
+/// <param name="dir_entrance"> æŒ‡å®šç›®å½•æ–‡ä»¶ç¡¬ç›˜å…¥å£ç°‡å· </param>
+/// <return> å†…å­˜ç›®å½•ç»“æ„ </return>
 Directory MiniFS::readDirectory(uint_32 dir_entrance) const
 {
-	Directory	cur_dir;							// µ±Ç°¶ÁÈ¡µÄÎÄ¼şÄ¿Â¼
-	DFC			dir_buffer;							// Ä¿Â¼ÎÄ¼ş»º³åÇø
-	uint_32		cur_cluster = dir_entrance;			// µ±Ç°´¦ÀíµÄ´ØºÅ
-	uint_32		block_num = mbr.cluster_size * 16;	// µ¥´Ø¿É´æfcb¿éÊı
-	uint_32		remain_file;						// µ±Ç°ÎÄ¼ş¼ĞÎ´¶ÁÈ¡FCBÎÄ¼şÊı
-	uint_32		remain_block;						// µ±Ç°´ØÎ´¶Á¿éÊı
+	Directory	cur_dir;							// å½“å‰è¯»å–çš„æ–‡ä»¶ç›®å½•
+	DFC			dir_buffer;							// ç›®å½•æ–‡ä»¶ç¼“å†²åŒº
+	uint_32		cur_cluster = dir_entrance;			// å½“å‰å¤„ç†çš„ç°‡å·
+	uint_32		block_num = mbr.cluster_size * 16;	// å•ç°‡å¯å­˜fcbå—æ•°
+	uint_32		remain_file;						// å½“å‰æ–‡ä»¶å¤¹æœªè¯»å–FCBæ–‡ä»¶æ•°
+	uint_32		remain_block;						// å½“å‰ç°‡æœªè¯»å—æ•°
 
 	fseek(space_fp, dir_entrance * mbr.cluster_size * 1024, SEEK_SET);
 	fread(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
@@ -115,15 +60,15 @@ Directory MiniFS::readDirectory(uint_32 dir_entrance) const
 	return cur_dir;
 }
 
-/// <summary> ½«Ä¿Â¼ÎÄ¼şÖØĞ´»ØÓ²ÅÌ </summary>
-/// <param name="dir"> Ö¸¶¨Ä¿Â¼ÎÄ¼ş </param>
+/// <summary> å°†ç›®å½•æ–‡ä»¶é‡å†™å›ç¡¬ç›˜ </summary>
+/// <param name="dir"> æŒ‡å®šç›®å½•æ–‡ä»¶ </param>
 void MiniFS::rewriteDirectory(const Directory dir) const
 {
-	uint_32		cur_cluster;						// µ±Ç°´¦Àí´ØºÅ
-	uint_32		remain_file;						// µ±Ç°ÎÄ¼ş¼ĞÎ´¶ÁÈ¡FCBÎÄ¼şÊı
-	uint_32		remain_block;						// µ±Ç°´ØÊ£Óà¿Õ¿éÊı
-	uint_32		block_num = mbr.cluster_size * 16;	// µ¥´Ø¿É´æfcb¿éÊı
-	DFC			dir_buffer;							// Ä¿Â¼ÎÄ¼ş»º³åÇø
+	uint_32		cur_cluster;						// å½“å‰å¤„ç†ç°‡å·
+	uint_32		remain_file;						// å½“å‰æ–‡ä»¶å¤¹æœªè¯»å–FCBæ–‡ä»¶æ•°
+	uint_32		remain_block;						// å½“å‰ç°‡å‰©ä½™ç©ºå—æ•°
+	uint_32		block_num = mbr.cluster_size * 16;	// å•ç°‡å¯å­˜fcbå—æ•°
+	DFC			dir_buffer;							// ç›®å½•æ–‡ä»¶ç¼“å†²åŒº
 
 	remain_file = dir.header.file_num;
 	remain_block = block_num - 1;
@@ -182,12 +127,12 @@ void MiniFS::rewriteDirectory(const Directory dir) const
 	FAT[cur_cluster] = ECOF;
 }
 
-/// <summary> ½«ĞÂ½¨µÄÄ¿Â¼ÎÄ¼şĞ´½øÓ²ÅÌ </summary>
-/// <param name="dir"> Ä¿Â¼ĞÅÏ¢ </param>
+/// <summary> å°†æ–°å»ºçš„ç›®å½•æ–‡ä»¶å†™è¿›ç¡¬ç›˜ </summary>
+/// <param name="dir"> ç›®å½•ä¿¡æ¯ </param>
 void MiniFS::newWriteDirectory(const Directory dir) const
 {
-	uint_32		cur_cluster;						// µ±Ç°´¦Àí´ØºÅ
-	DFC			dir_buffer;							// Ä¿Â¼ÎÄ¼ş»º³åÇø
+	uint_32		cur_cluster;						// å½“å‰å¤„ç†ç°‡å·
+	DFC			dir_buffer;							// ç›®å½•æ–‡ä»¶ç¼“å†²åŒº
 
 	cur_cluster = MfsAlg::BitFindRoom(CAB, mbr.cluster_num);
 	MfsAlg::BitSet(CAB, mbr.cluster_num, cur_cluster);

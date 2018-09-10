@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  *
  *	Mini File System Project
  *
@@ -12,8 +12,9 @@
 
 int main(int argc, char *argv[])
 {
-	// ´´½¨ÎÄ¼ş±äÁ¿
-	while (1)
+	// åˆ›å»ºæ–‡ä»¶å˜é‡
+    MiniFS minifs;
+	while (minifs.cmd())
 		;
 	return 0;
 }

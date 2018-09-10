@@ -1,27 +1,27 @@
-//
+ï»¿//
 //	mfs_algorithm.h
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	This is the algorithm library that Mini File System need.
 //
-#pragma once
+
 #ifndef __MFS_ALGORITHM_H__
 #define __MFS_ALGORITHM_H__
 
-/// Î¢ĞÍÎÄ¼şÏµÍ³Ëã·¨¿â
+/// å¾®å‹æ–‡ä»¶ç³»ç»Ÿç®—æ³•åº“
 namespace MfsAlg
 {
 
-/// Î»²Ù×÷
-// Î»²Ù×÷: ÖÃÎ»1
+/// ä½æ“ä½œ
+// ä½æ“ä½œ: ç½®ä½1
 bool BitSet(uint_8 table[], uint_32 size, uint_32 bit_No);
-// Î»²Ù×÷: ÖÃÁã
+// ä½æ“ä½œ: ç½®é›¶
 bool BitReset(uint_8 table[], uint_32 size, uint_32 bit_No);
-// Î»²Ù×÷: ²éÕÒ0ÖµÎ»ºÅ
+// ä½æ“ä½œ: æŸ¥æ‰¾0å€¼ä½å·
 uint_32 BitFindRoom(uint_8 table[], uint_32 size);
 
-/// ×Ö·û´®Æ¥Åä
+/// å­—ç¬¦ä¸²åŒ¹é…
 
 } // namespace MfsAlg
 

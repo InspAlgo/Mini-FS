@@ -1,11 +1,11 @@
-//
+ï»¿//
 //	mfs_cs_fileop.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	Class MiniFS: This file implements operations on files in space.
 //
-
+#pragma warning(disable:4996)
 #include "mini_file_system.h"
 
 
@@ -84,8 +84,8 @@ int MiniFS::makeDir(char filename[])
 	return 1;
 }
 
-/// <summary> ´´½¨ÎÄ¼ş </summary>
-/// <return> -1:´´½¨Ê§°Ü; 1:´´½¨³É¹¦ </return>
+/// <summary> åˆ›å»ºæ–‡ä»¶ </summary>
+/// <return> -1:åˆ›å»ºå¤±è´¥; 1:åˆ›å»ºæˆåŠŸ </return>
 int MiniFS::createFile(char filename[])
 {
 	Directory current_directory = directory[directory.size() - 1];

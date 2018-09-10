@@ -1,11 +1,11 @@
-//
+ï»¿//
 //	mfs_define.h
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	This is the definition of basic data structures for Mini File System.
 //
-#pragma once
+
 #ifndef __MFS_DEFINE_H__
 #define __MFS_DEFINE_H__
 
@@ -26,89 +26,89 @@ typedef unsigned short uint_16;
 typedef unsigned int uint_32;
 typedef unsigned long long uint_64;
 
-/// FAT±íÎÄ¼şÖÕÖ¹±ê¼Ç (End Cluster Of File)
+/// FATè¡¨æ–‡ä»¶ç»ˆæ­¢æ ‡è®° (End Cluster Of File)
 #define ECOF (0xffffffff)
 
-///	Ö÷Òıµ¼¼ÇÂ¼ (Main Boot Record)							[64B]
+///	ä¸»å¼•å¯¼è®°å½• (Main Boot Record)							[64B]
 struct MBR
 {
-	char space_name[16];	  // ¿Õ¼äÃû×Ö					[16B]
-	uint_32 space_size;		  // ¿Õ¼äÈİÁ¿ (µ¥Î»: MB)			[4B]
-	uint_32 cluster_size;	 // µ¥´Ø´óĞ¡ (µ¥Î»: KB)			[4B]
-	uint_32 cluster_num;	  // ¿Õ¼ä´ØÊıÄ¿ 					[4B]
-	uint_32 CAB_entrance;	 // ´Ø·ÖÅäÎ»Í¼ Èë¿Ú´ØºÅ 			[4B]
-	uint_32 FAT_entrance;	 // ÎÄ¼ş·ÖÅäÍ¼ Èë¿Ú´ØºÅ 			[4B]
-	uint_32 RDF_entrance;	 // ¸ùÄ¿Â¼ÎÄ¼ş Èë¿Ú´ØºÅ 			[4B]
-	time_t create_time;		  // ¿Õ¼ä´´½¨Ê±¼ä 				[8B]
-	uint_32 free_cluster_num; // ¿ÕÏĞ´ØÊıÄ¿ 					[4B]
-	uint_8 MBR_reserved[12];  // ±£Áô12×Ö½Ú					[12B]
+	char space_name[16];	  // ç©ºé—´åå­—					[16B]
+	uint_32 space_size;		  // ç©ºé—´å®¹é‡ (å•ä½: MB)			[4B]
+	uint_32 cluster_size;	 // å•ç°‡å¤§å° (å•ä½: KB)			[4B]
+	uint_32 cluster_num;	  // ç©ºé—´ç°‡æ•°ç›® 					[4B]
+	uint_32 CAB_entrance;	 // ç°‡åˆ†é…ä½å›¾ å…¥å£ç°‡å· 			[4B]
+	uint_32 FAT_entrance;	 // æ–‡ä»¶åˆ†é…å›¾ å…¥å£ç°‡å· 			[4B]
+	uint_32 RDF_entrance;	 // æ ¹ç›®å½•æ–‡ä»¶ å…¥å£ç°‡å· 			[4B]
+	time_t create_time;		  // ç©ºé—´åˆ›å»ºæ—¶é—´ 				[8B]
+	uint_32 free_cluster_num; // ç©ºé—²ç°‡æ•°ç›® 					[4B]
+	uint_8 MBR_reserved[12];  // ä¿ç•™12å­—èŠ‚					[12B]
 };
 
-// ¾²Ì¬¶ÏÑÔ:
-static_assert(sizeof(MBR) == 64, "MBRÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
+// é™æ€æ–­è¨€:
+static_assert(sizeof(MBR) == 64, "MBRå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
 
-///	ÎÄ¼ş¿ØÖÆ¿é (File Control Block)								[64B]
+///	æ–‡ä»¶æ§åˆ¶å— (File Control Block)								[64B]
 struct FCB
 {
-	char name[12];				// ÎÄ¼şÃû						[12B]
-	char extension[4];			// ÎÄ¼şÍØÕ¹Ãû					[4B]
-	uint_8 mark;				// ±êÖ¾Óò: 0:ÎÄ¼ş¼Ğ 1:ÎÄ¼ş		[1B]
-	uint_8 attribute;			// ÎÄ¼şÊôĞÔ						[1B]
-	uint_8 delete_flag;			// É¾³ı±ê¼Ç: 0:´æÔÚ 1:É¾³ı		[1B]
-	uint_8 FCB_reserved_1[5];   // ±£Áô5×Ö½Ú						[5B]
-	uint_32 data_entrance;		// ÎÄ¼şÊı¾İ Èë¿Ú´ØºÅ				[4B]
-	uint_32 occupy_cluster_num; // ÎÄ¼şÕ¼ÓÃ´ØÊıÄ¿					[4B]
-	uint_64 file_size;			// ÎÄ¼ş´óĞ¡ µ¥Î»B					[8B]
-	time_t create_time;			// ÎÄ¼ş´´½¨Ê±¼ä					[8B]
-	time_t modify_time;			// ÎÄ¼ş×îºóÒ»´ÎĞŞ¸ÄÊ±¼ä			[8B]
-	uint_8 FCB_reserved_2[8];   // ±£Áô8×Ö½Ú						[8B]
+	char name[12];				// æ–‡ä»¶å						[12B]
+	char extension[4];			// æ–‡ä»¶æ‹“å±•å					[4B]
+	uint_8 mark;				// æ ‡å¿—åŸŸ: 0:æ–‡ä»¶å¤¹ 1:æ–‡ä»¶		[1B]
+	uint_8 attribute;			// æ–‡ä»¶å±æ€§						[1B]
+	uint_8 delete_flag;			// åˆ é™¤æ ‡è®°: 0:å­˜åœ¨ 1:åˆ é™¤		[1B]
+	uint_8 FCB_reserved_1[5];   // ä¿ç•™5å­—èŠ‚						[5B]
+	uint_32 data_entrance;		// æ–‡ä»¶æ•°æ® å…¥å£ç°‡å·				[4B]
+	uint_32 occupy_cluster_num; // æ–‡ä»¶å ç”¨ç°‡æ•°ç›®					[4B]
+	uint_64 file_size;			// æ–‡ä»¶å¤§å° å•ä½B					[8B]
+	time_t create_time;			// æ–‡ä»¶åˆ›å»ºæ—¶é—´					[8B]
+	time_t modify_time;			// æ–‡ä»¶æœ€åä¸€æ¬¡ä¿®æ”¹æ—¶é—´			[8B]
+	uint_8 FCB_reserved_2[8];   // ä¿ç•™8å­—èŠ‚						[8B]
 };
 
-// ¾²Ì¬¶ÏÑÔ:
-static_assert(sizeof(FCB) == 64, "FCBÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
+// é™æ€æ–­è¨€:
+static_assert(sizeof(FCB) == 64, "FCBå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
 
-///	Ä¿Â¼ÎÄ¼şÍ· (Directory File Header)							[64B]
+///	ç›®å½•æ–‡ä»¶å¤´ (Directory File Header)							[64B]
 struct DFH
 {
-	char name[12];				  // µ±Ç°Ä¿Â¼ÎÄ¼şÃû				[12B]
-	uint_8 DFH_reserved_1[4];	 // ±£Áô4×Ö½Ú					[4B]
-	uint_32 occupy_cluster_num;   // ÎÄ¼ş¼ĞÕ¼ÓÃ´ØÊıÄ¿				[4B]
-	uint_32 current_dir_entrance; // µ±Ç°Ä¿Â¼ÎÄ¼ş Èë¿Ú´ØºÅ		[4B]
-	uint_32 parent_dir_entrance;  // ÉÏÒ»¼¶Ä¿Â¼ÎÄ¼ş Èë¿Ú´ØºÅ		[4B]
-	uint_32 file_num;			  // ¸ÃÄ¿Â¼ÏÂÎÄ¼şÊıÄ¿				[4B]
-	time_t create_time;			  // ÎÄ¼ş¼Ğ´´½¨Ê±¼ä				[8B]
-	time_t modify_time;			  // ÎÄ¼ş¼Ğ×îºóÒ»´ÎĞŞ¸ÄÊ±¼ä		[8B]
-	uint_64 folder_size;		  // ÎÄ¼ş¼Ğ´óĞ¡ µ¥Î»B				[8B]
-	uint_8 DFH_reserved[8];		  // ±£Áô8×Ö½Ú					[8B]
+	char name[12];				  // å½“å‰ç›®å½•æ–‡ä»¶å				[12B]
+	uint_8 DFH_reserved_1[4];	 // ä¿ç•™4å­—èŠ‚					[4B]
+	uint_32 occupy_cluster_num;   // æ–‡ä»¶å¤¹å ç”¨ç°‡æ•°ç›®				[4B]
+	uint_32 current_dir_entrance; // å½“å‰ç›®å½•æ–‡ä»¶ å…¥å£ç°‡å·		[4B]
+	uint_32 parent_dir_entrance;  // ä¸Šä¸€çº§ç›®å½•æ–‡ä»¶ å…¥å£ç°‡å·		[4B]
+	uint_32 file_num;			  // è¯¥ç›®å½•ä¸‹æ–‡ä»¶æ•°ç›®				[4B]
+	time_t create_time;			  // æ–‡ä»¶å¤¹åˆ›å»ºæ—¶é—´				[8B]
+	time_t modify_time;			  // æ–‡ä»¶å¤¹æœ€åä¸€æ¬¡ä¿®æ”¹æ—¶é—´		[8B]
+	uint_64 folder_size;		  // æ–‡ä»¶å¤¹å¤§å° å•ä½B				[8B]
+	uint_8 DFH_reserved[8];		  // ä¿ç•™8å­—èŠ‚					[8B]
 };
 
-// ¾²Ì¬¶ÏÑÔ:
-static_assert(sizeof(DFH) == 64, "DFHÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
+// é™æ€æ–­è¨€:
+static_assert(sizeof(DFH) == 64, "DFHå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
 
-///	Ä¿Â¼ÎÄ¼ş´Ø (Directory File Cluster)							[64KB]
+///	ç›®å½•æ–‡ä»¶ç°‡ (Directory File Cluster)							[64KB]
 union DFC {
 	struct
 	{
 		DFH header;
 		FCB fcb[1023];
-	} firstclu; // Ä¿Â¼ÎÄ¼şµÚÒ»´Ø					[64KB]
+	} firstclu; // ç›®å½•æ–‡ä»¶ç¬¬ä¸€ç°‡					[64KB]
 
 	struct
 	{
 		FCB fcb[1024];
-	} otherclu; // Ä¿Â¼ÎÄ¼şÆäËü´Ø					[64KB]
+	} otherclu; // ç›®å½•æ–‡ä»¶å…¶å®ƒç°‡					[64KB]
 };
 
-// ¾²Ì¬¶ÏÑÔ:
-static_assert(sizeof(DFC::firstclu) == 64 * 1024, "DFCµÄfirstcluÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
-static_assert(sizeof(DFC::otherclu) == 64 * 1024, "DFCµÄothercluÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
-static_assert(sizeof(DFC) == 64 * 1024, "DFCÕ¼ÓÃÄÚ´æ´óĞ¡³ö´í: ×¢Òâ±ß½ç¶ÔÆë;");
+// é™æ€æ–­è¨€:
+static_assert(sizeof(DFC::firstclu) == 64 * 1024, "DFCçš„firstcluå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
+static_assert(sizeof(DFC::otherclu) == 64 * 1024, "DFCçš„othercluå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
+static_assert(sizeof(DFC) == 64 * 1024, "DFCå ç”¨å†…å­˜å¤§å°å‡ºé”™: æ³¨æ„è¾¹ç•Œå¯¹é½;");
 
-///	ÎÄ¼şÄ¿Â¼ (Directory)
+///	æ–‡ä»¶ç›®å½• (Directory)
 struct Directory
 {
-	DFH header; // Ä¿Â¼ÎÄ¼şÍ·
-	FCB *fcb;   // Ä¿Â¼ÎÄ¼şĞÅÏ¢
+	DFH header; // ç›®å½•æ–‡ä»¶å¤´
+	FCB *fcb;   // ç›®å½•æ–‡ä»¶ä¿¡æ¯
 };
 
 #endif

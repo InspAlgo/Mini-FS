@@ -1,4 +1,4 @@
-//
+﻿//
 //	mfs_cs_help.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -27,7 +27,8 @@
 	std::cout << "指令含义: " << cmd_content << std::endl;          \
 	std::cout << "指令示例: " << cmd_example << std::endl;
 
-void showHelp(int mode)
+
+void MiniFS::showHelp(int mode)
 {
 	switch (mode)
 	{
