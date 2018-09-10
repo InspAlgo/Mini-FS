@@ -10,6 +10,7 @@
 
 MiniFS::MiniFS()
 {
+    this->if_open = false;
 }
 
 MiniFS::~MiniFS()

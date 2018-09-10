@@ -21,7 +21,7 @@ private:
 	uint_32 *FAT;											// 文件分配表
 	std::vector<Directory> directory; // 文件目录
 	void *buffer;											// 空间输入输出缓冲区
-
+    bool if_open;   // 判断空间是否打开
 public:
 	MiniFS();
 	~MiniFS();

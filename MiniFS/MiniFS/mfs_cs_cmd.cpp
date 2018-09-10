@@ -8,6 +8,58 @@
 
 #include "mini_file_system.h"
 
+std::string command_array[] = {"create","mount","fmt","dr","cp","dl","att","help","close","end","mkdir"};
+int command_distance[11];
+typedef std::vector<int> TX;
+typedef std::vector<TX> Tmatrix;
+
+// 编辑距离算法 计算输入命令与已有命令参数相似度 从而在输入命令错误时给出推荐输入命令
+int ldistance(const std::string source, const std::string target)
+{
+    //step 1
+    int n = source.length();
+    int m = target.length();
+    if (m == 0)
+        return n;
+    if (n == 0)
+        return m;
+
+    Tmatrix matrix(n + 1);
+    for (int i = 0; i <= n; i++)
+        matrix[i].resize(m + 1);
+    //step 2 Initialize
+    for (int i = 1; i <= n; i++)
+        matrix[i][0] = i;
+    for (int i = 1; i <= m; i++)
+        matrix[0][i] = i;
+    //step 3
+    for (int i = 1; i <= n; i++)
+    {
+        const char si = source[i - 1];
+        //step 4
+        for (int j = 1; j <= m; j++)
+        {
+            const char dj = target[j - 1];
+            //step 5
+            int cost;
+            if (si == dj)
+            {
+                cost = 0;
+            }
+            else
+            {
+                cost = 1;
+            }
+            //step 6
+            const int above = matrix[i - 1][j] + 1;
+            const int left = matrix[i][j - 1] + 1;
+            const int diag = matrix[i - 1][j - 1] + cost;
+            matrix[i][j] = std::min(above, std::min(left, diag));
+        }
+    } //step7
+    return matrix[n][m];
+}
+
 inline void MiniFS::printFilePath(void)
 {
 	printf("Mini-FS:");
@@ -15,10 +67,11 @@ inline void MiniFS::printFilePath(void)
 	for (iter = directory.begin(); iter != directory.end(); iter++)
 		printf("\\%s", (*iter).header.name);
 	putchar('>');
-}
+} 
 
 int MiniFS::cmd(void)
 {
+    this->printFilePath();
 	char delim = ' ';
 	std::string input_temp = "";
 	std::string command_input = "";
@@ -74,51 +127,72 @@ int MiniFS::cmd(void)
 	{
 		if (command_num == 2)
 		{
-			std::regex reg_pattern("^\\w+$"); // 当文件名为英文、数字和下划线时合法
-			if (std::regex_match(command_vector[1], reg_pattern))
-			{
-				this->createSpace((char *)command_vector[1].data(), 1024, 4);
-				std::cout << "YES!" << std::endl;
-			}
-			else
-				std::cout << command_vector[1] << " 非法文件名!" << std::endl;
+            if (this->createSpace((char *)command_vector[1].data(), 1024, 4) == 1)
+                std::cout << "空间创建成功!" << std::endl;
+            else
+                std::cout << "文件名已存在!" << std::endl;
 		}
 		else if (command_num == 3)
 		{
-			bool flag = true;
-
-			std::regex reg_pattern_name("^\\w+$"); // 当文件名为英文、数字和下划线时合法
-			if (!std::regex_match(command_vector[1], reg_pattern_name))
-			{
-				std::cout << command_vector[1] << " 非法文件名!" << std::endl;
-				flag = false;
-			}
-
-			std::regex reg_pattern_size("^\\+?[1-9][0-9]*$"); // 空间大小必须为非0整数
-			if (!std::regex_match(command_vector[2], reg_pattern_size))
+			std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$"); // 空间大小必须为非0整数
+			if (!std::regex_match(command_vector[2], reg_pattern_space_size))
 			{
 				std::cout << command_vector[2] << " 不是非零整数!" << std::endl;
 				return 1;
 			}
 
 			int space_size = atoi((char *)command_vector[2].data());
-			if (space_size < 128)
+			if (space_size < 128 || space_size > 2048)
 			{
-				std::cout << command_vector[2] << " 不能小于 128!" << std::endl;
-				flag = false;
+				std::cout << command_vector[2] << " 不能小于 128 或大于 2048!" << std::endl;
+                return 1;
 			}
 
-			if (!flag)
-				return 1;
-
-			this->createSpace((char *)command_vector[1].data(), space_size, 4);
-			std::cout << "YES!" << std::endl;
+            if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, 4) == 1)
+                std::cout << "空间创建成功!" << std::endl;
+            else
+                std::cout << "文件名已存在!" << std::endl;
 		}
+        else if (command_num == 4)
+        {
+            std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$");
+            if (!std::regex_match(command_vector[2], reg_pattern_space_size))
+            {
+                std::cout << command_vector[2] << " 不是非零整数!" << std::endl;
+                return 1;
+            }
+
+            int space_size = atoi((char *)command_vector[2].data());
+            if (space_size < 128 || space_size > 2048)
+            {
+                std::cout << command_vector[2] << " 不能小于 128 或大于 2048!" << std::endl;
+                return 1;
+            }
+
+            std::regex reg_pattern_cluster_size("^\\+?[1-9][0-9]*$");
+            if (!std::regex_match(command_vector[3], reg_pattern_cluster_size))
+            {
+                std::cout << command_vector[3] << " 不是非零整数!" << std::endl;
+                return 1;
+            }
+
+            int cluster_size = atoi((char *)command_vector[3].data());
+            if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
+            {
+                std::cout << command_vector[3] << " 不是建议参数!(应{x|1<=x<=64 且 x为2的幂次方})" << std::endl;
+                return 1;
+            }
+
+            if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, (uint_32)cluster_size) == 1)
+                std::cout << "空间创建成功!" << std::endl;
+            else
+                std::cout << "文件名已存在!" << std::endl;
+        }
 		else
 			std::cout << command << " 参数错误!" << std::endl;
 	}
 
-	// example: mount space_name; space_name 可以包含路径
+	// example: mount space_name; space_name 可以包含路径 ok
 	else if (command == "mount")
 	{
 		if (command_num == 2)
@@ -126,8 +200,10 @@ int MiniFS::cmd(void)
 			std::ifstream ifs(command_vector[1].c_str());
 			if (ifs)
 			{
-				std::cout << command_vector[1] << " 存在" << std::endl;
-				this->mountSpace((char *)command_vector[1].data());
+                if (this->mountSpace((char *)command_vector[1].data()) != 1)
+                    std::cout << command_vector[1] << " 打开失败!" << std::endl;
+                else
+                    this->if_open = true;
 			}
 			else
 				std::cout << command_vector[1] << " 不存在此路径!" << std::endl;
@@ -139,13 +215,10 @@ int MiniFS::cmd(void)
 	// example: dr; 显示当前文件夹下的文件目录
 	else if (command == "dr")
 	{
-		if (command_num == 1)
-		{
-			this->showDirectory();
-			std::cout << command << " YES!" << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (command_num == 1)
+            this->showDirectory();
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
 	// example: cp filename_old filename_new;
@@ -167,31 +240,7 @@ int MiniFS::cmd(void)
 		if (command_num == 2)
 		{
 			// 判断 filename 的合法性
-			std::cout << command_vector[1] << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
-	}
-
-	// example: tp filename; 显示单个文本文件
-	else if (command == "tp")
-	{
-		if (command_num == 2)
-		{
-			// 判断 filename 的合法性
-			std::cout << command_vector[1] << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
-	}
-
-	// example: more filename; 分页显示文本文件
-	else if (command == "more")
-	{
-		if (command_num == 2)
-		{
-			// 判断 filename 的合法性
-			std::cout << command_vector[1] << std::endl;
+            std::cout << command_vector[1] << std::endl;
 		}
 		else
 			std::cout << command << " 参数错误!" << std::endl;
@@ -209,7 +258,7 @@ int MiniFS::cmd(void)
 			std::cout << command << " 参数错误!" << std::endl;
 	}
 
-	// example: help [命令名(可选)];
+	// example: help [命令名(可选)];   ok
 	else if (command == "help")
 	{
 		if (command_num == 1)
@@ -247,47 +296,147 @@ int MiniFS::cmd(void)
 			std::cout << command << " 参数错误!" << std::endl;
 	}
 
-	// example: close;  关闭当前空间
+	// example: close;  关闭当前空间  ok
 	else if (command == "close")
 	{
 		if (command_num == 1)
 		{
+            if (!this->if_open)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+
 			this->closeSpace(); // 需要做一些回写操作
-			return 0;
+            this->if_open = false;
 		}
 		else
 			std::cout << command << " 参数错误!" << std::endl;
 	}
 
-	// example: fmt [size(可选)]; 格式化当前空间
+	// example: fmt [size(可选)]; 格式化当前空间  ok
 	else if (command == "fmt")
 	{
-		if (command_num == 1)
-		{
-			this->formatSpace(); // 默认为 4
-			std::cout << command << " YES!" << std::endl;
-		}
-		else if (command_num == 2)
-		{
-			if (command_vector[1] == "4")
-			{
-				this->formatSpace();
-				std::cout << command_vector[1] << " YES!" << std::endl;
-			}
-			else if (command_vector[1] == "8")
-			{
-				this->formatSpace((uint_32)8);
-				std::cout << command_vector[1] << " YES!" << std::endl;
-			}
-			else
-				std::cout << command_vector[1] << " 不是推荐的参数!" << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (command_num == 1)
+        {
+            if (!this->if_open)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+            this->formatSpace(); // 默认为 4
+            std::cout << "格式化成功!" << std::endl;
+        }
+        else if (command_num == 2)
+        {
+            std::regex reg_pattern_size("^\\+?[1-9][0-9]*$");  // 非0整数
+            if (!std::regex_match(command_vector[1], reg_pattern_size))
+            {
+                std::cout << command_vector[1] << " 不是非零整数!" << std::endl;
+                return 1;
+            }
+
+            int cluster_size = atoi((char *)command_vector[1].data());
+            if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
+            {
+                std::cout << command_vector[1] << " 不是建议参数!(应{x|1<=x<=64 且 x为2的幂次方})" << std::endl;
+                return 1;
+            }
+
+            this->formatSpace((uint_32)cluster_size);
+            std::cout << "格式化成功!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
-	else
-		std::cout << command << " 不是一个正确的命令!" << std::endl;
+    // example: end; 退出程序  ok
+    else if (command == "end")
+    {
+        if (command_num == 1)
+            return 0;
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
+    // example: mkdir <name>; 创建名为 name 文件夹
+    else if (command == "mkdir")
+    {
+        if (command_num == 2)
+        {
+            if (command_vector[1].length() > 8)
+            {
+                std::cout << "创建" << command_vector[1] << " 失败，文件夹名称过长!" << std::endl;
+                return 1;
+            }
+
+            if (this->makeDir((char *)command_vector[1].data()) == -1)
+                std::cout << command_vector[1] << " 文件夹重名!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
+    // example: cd <dirname>; 移动到 dirname 文件夹
+    else if (command == "cd")
+    {
+        if (command_num == 2)
+        {
+           // if (this->changeDirectory((char *)command_vector[1].data()) != 1)
+           //     std::cout << command_vector[1] << " 不存在!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
+    // example: touch filename; 创建 filename 文件
+    else if (command == "touch")
+    {
+        if (command_num == 2)
+        {
+            if (command_vector[1].length() > 12)
+            {
+                std::cout << "创建" << command_vector[1] << " 失败，文件名称过长!" << std::endl;
+                return 1;
+            }
+
+            if (this->createFile((char *)command_vector[1].data()) == -1)
+                std::cout << command_vector[1] << " 文件重名!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
+    else
+    {
+        std::cout << command << " 不是一个正确的命令!" << std::endl;
+        bool if_dis = false;
+        for (int i = 0; i < 11; i++)
+        {
+            command_distance[i]= ldistance(command, command_array[i]);
+            if (command_distance[i] < 3)
+                if_dis = true;
+        }
+        if (!if_dis)
+            return 1;
+        std::cout << "您是想输入 ";
+        bool dis_flag = false;
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 11; j++)
+            {
+                if (command_distance[j] == i)
+                {
+                    std::cout << command_array[j] << " ";
+                    if (i <= 0)
+                        dis_flag = true;
+                }
+            }
+            if (dis_flag)
+                break;
+        }
+        std::cout << "命令吗?" << std::endl;
+    }
 
 	return 1;
 }
