@@ -3,6 +3,7 @@ MiniFS/.vs/*
 MiniFS/Debug/*
 MiniFS/Release/*
 MiniFS/x64/*
+.vs/*
 MiniFS/MiniFS/Debug/*
 MiniFS/MiniFS/Release/*
 MiniFS/MiniFS/x64/*

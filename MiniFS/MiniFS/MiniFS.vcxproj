@@ -28,6 +28,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mfs_algorithm.cpp" />
     <ClCompile Include="mfs_coresystem.cpp" />
+    <ClCompile Include="mfs_cs_cmd.cpp" />
+    <ClCompile Include="mfs_cs_diskio.cpp" />
+    <ClCompile Include="mfs_cs_fileop.cpp" />
+    <ClCompile Include="mfs_cs_help.cpp" />
+    <ClCompile Include="mfs_cs_spaceop.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

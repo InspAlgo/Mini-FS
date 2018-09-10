@@ -38,5 +38,20 @@
     <ClCompile Include="mfs_coresystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mfs_cs_cmd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mfs_cs_diskio.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mfs_cs_fileop.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mfs_cs_help.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mfs_cs_spaceop.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

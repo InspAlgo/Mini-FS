@@ -1,30 +1,19 @@
-ï»¿/**
- *	main.cpp
+/**
  *
- *		Copyright (c) 2018 AlphaBeta Team. All rights reserved.
+ *	Mini File System Project
  *
- *	This is application of Mini File System.
+ *		Copyright (c) 2018 AlphaBeta Team. All rights reserved. 
  *
- *
- *
- *	Mini File System Project:
- *		Team:		AlphaBeta.
- *		Member:		Linfeng Li, Runbang Xu, Bole Ma, Chi Zhang, Dalin Miao.
- *		Tutor:		Chunxia Zhang, Shuoying Chen.
- *		Company:	School of Computer Science, Beijing Institute of Technology.
- *		Version:	3.2.12 (Release)
- *		Submit:		September 11th, 2018.
+ *	Member: Linfeng Li, Runbang Xu, Bole Ma, Chi Zhang, Dalin Miao. 
  *
 **/
 
-
 #include "mini_file_system.h"
 
-
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
-	// åˆ›å»ºæ–‡ä»¶å˜é‡
-    MiniFS minifs;
-	while (minifs.cmd());
+	// ´´½¨ÎÄ¼ş±äÁ¿
+	while (1)
+		;
 	return 0;
 }

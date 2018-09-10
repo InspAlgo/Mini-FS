@@ -1,4 +1,4 @@
-ï»¿//
+//
 //	mfs_algorithm.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -8,66 +8,67 @@
 
 #include "mini_file_system.h"
 
+/// ½öÏŞ±¾ÎÄ¼şÊ¹ÓÃ
+static const uint_8 set_mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+static const uint_8 reset_mask[8] = {127, 191, 223, 239, 247, 251, 253, 254};
 
-
-/// ä»…é™æœ¬æ–‡ä»¶ä½¿ç”¨
-static const uint_8	set_mask[8]   = {128,  64,  32,  16,   8,   4,   2,   1};
-static const uint_8	reset_mask[8] = {127, 191, 223, 239, 247, 251, 253, 254};
-
-
-/// <summary> ä½æ“ä½œ: ç½®ä½1 </summary>
-/// <param name="table"> å¾…ç½®ä½æ•°ç»„ </param>
-/// <param name="size"> æ•°ç»„æœ‰æ•ˆä½æ•°ç›® </param>
-/// <param name="bit_no"> ç½®1çš„ä½ç½® </param>
-/// <return> true:ç½®ä½æˆåŠŸ; false:ç½®ä½å¤±è´¥ </return>
-bool	MfsAlg::BitSet(uint_8 table[], uint_32 size, uint_32 bit_No)
+/// <summary> Î»²Ù×÷: ÖÃÎ»1 </summary>
+/// <param name="table"> ´ıÖÃÎ»Êı×é </param>
+/// <param name="size"> Êı×éÓĞĞ§Î»ÊıÄ¿ </param>
+/// <param name="bit_no"> ÖÃ1µÄÎ»ÖÃ </param>
+/// <return> true:ÖÃÎ»³É¹¦; false:ÖÃÎ»Ê§°Ü </return>
+bool MfsAlg::BitSet(uint_8 table[], uint_32 size, uint_32 bit_No)
 {
-	if (bit_No >= size) {
+	if (bit_No >= size)
+	{
 		return false;
 	}
 	table[bit_No >> 3] |= set_mask[bit_No & 7];
 	return true;
 }
 
-
-/// <summary> ä½æ“ä½œ: ç½®é›¶ </summary>
-/// <return> true:ç½®é›¶æˆåŠŸ; false:ç½®é›¶å¤±è´¥ </return>
-bool	MfsAlg::BitReset(uint_8 table[], uint_32 size, uint_32 bit_No)
+/// <summary> Î»²Ù×÷: ÖÃÁã </summary>
+/// <return> true:ÖÃÁã³É¹¦; false:ÖÃÁãÊ§°Ü </return>
+bool MfsAlg::BitReset(uint_8 table[], uint_32 size, uint_32 bit_No)
 {
-	if (bit_No >= size) {
+	if (bit_No >= size)
+	{
 		return false;
 	}
 	table[bit_No >> 3] &= reset_mask[bit_No & 7];
 	return true;
 }
 
-
-/// <summary> ä½æ“ä½œ: æŸ¥æ‰¾0å€¼ä½å· </summary>
-/// <return> true:ç½®é›¶æˆåŠŸ; 0xffffffff:æ— ç©ºä½ç½® </return>
-uint_32	MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
+/// <summary> Î»²Ù×÷: ²éÕÒ0ÖµÎ»ºÅ </summary>
+/// <return> true:ÖÃÁã³É¹¦; 0xffffffff:ÎŞ¿ÕÎ»ÖÃ </return>
+uint_32 MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
 {
-	bool	flag   = false;
-	uint_32	bit_No = 0xffffffff;
+	bool flag = false;
+	uint_32 bit_No = 0xffffffff;
 
-	int byte_num = (int)ceil(size*1.0/8.0);
-	for (int i = 0; i < byte_num; i++) {
-		if (table[i] == 255) {
+	int byte_num = (int)ceil(size * 1.0 / 8.0);
+	for (int i = 0; i < byte_num; i++)
+	{
+		if (table[i] == 255)
+		{
 			continue;
 		}
-		for (int j = 0; j < 8; j++) {
-			if (table[i] & set_mask[j] == 0) {
+		for (int j = 0; j < 8; j++)
+		{
+			if (table[i] & set_mask[j] == 0)
+			{
 				bit_No = i * 8 + j;
 				flag = true;
 				break;
 			}
 		}
-		if (flag) break;
+		if (flag)
+			break;
 	}
 
-	if (bit_No > size) {
+	if (bit_No > size)
+	{
 		bit_No = 0xffffffff;
 	}
 	return bit_No;
 }
-
-

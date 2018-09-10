@@ -1,63 +1,72 @@
-ï»¿//
+//
 //	mfs_coresystem.h
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	This is the core data structures of Mini File System.
 //
-#pragma once
+
 #ifndef __MFS_CORESYSTEM_H__
 #define __MFS_CORESYSTEM_H__
 
-
-///	å¾®å‹æ–‡ä»¶ç³»ç»Ÿ (Mini File System)
-class MiniFS {
+///	Î¢ĞÍÎÄ¼şÏµÍ³ (Mini File System)
+class MiniFS
+{
 private:
-	MBR						mbr;				// ä¸»å¼•å¯¼è®°å½• 
-	FILE *					space_fp;			// å½“å‰ç©ºé—´(æ–‡ä»¶)æŒ‡é’ˆ 
-	uint_8 *				CAB;				// ç°‡åˆ†é…ä½å›¾ 
-	uint_32					CAB_occupu_byte;	// CABå ç”¨å­—èŠ‚æ•° 
-	uint_32 *				FAT;				// æ–‡ä»¶åˆ†é…è¡¨ 
-	std::vector<Directory>	directory;			// æ–‡ä»¶ç›®å½• 
-	void *					buffer;				// ç©ºé—´è¾“å…¥è¾“å‡ºç¼“å†²åŒº 
+	MBR mbr;													// Ö÷Òıµ¼¼ÇÂ¼
+	FILE *space_fp;										// µ±Ç°¿Õ¼ä(ÎÄ¼ş)Ö¸Õë
+	uint_8 *CAB;											// ´Ø·ÖÅäÎ»Í¼
+	uint_32 CAB_occupu_byte;					// CABÕ¼ÓÃ×Ö½ÚÊı
+	uint_32 *FAT;											// ÎÄ¼ş·ÖÅä±í
+	std::vector<Directory> directory; // ÎÄ¼şÄ¿Â¼
+	void *buffer;											// ¿Õ¼äÊäÈëÊä³ö»º³åÇø
 
 public:
 	MiniFS();
 	~MiniFS();
 
-	int		cmd(void);				// è¾“å…¥å¤„ç† 
+	//	ÃüÁî½âÎöÄ£¿é			<mfs_cs_cmd.cpp>
+public:
+	int cmd(void);
 
 private:
-	inline void	readMBR(void);
-	inline void	writeMBR(void) const;
-	inline void	readCAB(void);
-	inline void	writeCAB(void) const;
-	inline void	readFAT(void);
-	inline void	writeFAT(void) const;
-	inline void	readCluster(const uint_32 cluster);
-	inline void	writeCluster(const uint_32 cluster) const;
-	Directory	readDirectory(const uint_32 dir_entrance) const;
-	void		rewriteDirectory(const Directory dir) const;
+	inline void printFilePath(void);
 
+	//	°ïÖúÏµÍ³Ä£¿é			<mfs_cs_help.cpp>
 private:
-	int		createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);	// åˆ›å»ºç©ºé—´
-	int		mountSpace(char name[]);
-	int		formatSpace(uint_32 cluster_size = 4);
-	int		closeSpace(void);
+	void showHelp(int mode = 0);
 
-	int		showDirectory(void);
-	int		copyFile(char filename_1[], char filename_2[], int mode);
-	int		deleteFile(char filename[]);
-	int		displayFile(char filename[]);
-	int		moreDisplayFile(char filename[]);
-	int		showAttribute(char filename[]);
-	int		showHelp(int mode = 0);
+	//	Ó²ÅÌ¶ÁĞ´Ä£¿é			<mfs_cs_diskio.cpp>
+private:
+	inline void readMBR(void);
+	inline void writeMBR(void) const;
+	inline void readCAB(void);
+	inline void writeCAB(void) const;
+	inline void readFAT(void);
+	inline void writeFAT(void) const;
+	inline void readCluster(const uint_32 cluster);
+	inline void writeCluster(const uint_32 cluster) const;
+	Directory readDirectory(const uint_32 dir_entrance) const;
+	void rewriteDirectory(const Directory dir) const;
+	void newWriteDirectory(const Directory dir) const;
 
-	// æ‹“å±•åŠŸèƒ½
-	int		makeDir(char filename[]);
-	// åˆ›å»ºæ–‡ä»¶ ç¼–è¾‘æ–‡ä»¶
+	//	¿Õ¼ä²Ù×÷Ä£¿é			<mfs_cs_spaceop.cpp>
+private:
+	int createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);
+	int mountSpace(char name[]);
+	int formatSpace(uint_32 cluster_size = 4);
+	int closeSpace(void);
+
+	//	ÎÄ¼ş²Ù×÷Ä£¿é			<mfs_cs_fileop.cpp>
+private:
+	int showDirectory(void);
+	int copyFile(char filename_1[], char filename_2[], int mode);
+	int deleteFile(char filename[]);
+	int displayFile(char filename[]);
+	int moreDisplayFile(char filename[]);
+	int showAttribute(char filename[]);
+	int makeDir(char filename[]);
+	int createFile(char filename[]);
 };
-
-
 
 #endif
