@@ -24,6 +24,7 @@
 int main(int argc,char *argv[])
 {
 	// 创建文件变量
-	while (1);
+    MiniFS minifs;
+	while (minifs.cmd());
 	return 0;
 }

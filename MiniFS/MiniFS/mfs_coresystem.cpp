@@ -6,6 +6,8 @@
 //	This is the core implementation of Mini File System.
 //
 
+#pragma warning(disable:4996)
+
 #include "mini_file_system.h"
 
 #define HELP_OUTPUT(cmd_name, cmd_content, cmd_layout) \
@@ -336,7 +338,7 @@ int MiniFS::cmd(void)
 			}
 			else if (command_vector[1] == "8")
 			{
-				this->formatSpace(8);
+				this->formatSpace((uint_32)8);
 				std::cout << command_vector[1] << " YES!" << std::endl;
 			}
 			else
@@ -469,10 +471,12 @@ void MiniFS::rewriteDirectory(const Directory dir) const
 
 int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 {
+    return 1;
 }
 
 int MiniFS::mountSpace(char name[])
 {
+    return 1;
 }
 
 /// <summary> 格式化空间 </summary>
@@ -563,40 +567,51 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 
 	// 改写文件缓冲区大小
 	buffer = realloc(buffer, mbr.cluster_size * 1024);
+
+    return 1;
 }
 
 int MiniFS::closeSpace(void)
 {
+    return 1;
 }
 
 int MiniFS::showDirectory(void)
 {
+    return 1;
 }
 
 int MiniFS::copyFile(char filename_1[], char filename_2[], int mode)
 {
+    return 1;
 }
 
 int MiniFS::deleteFile(char filename[])
 {
+    return 1;
 }
 
 int MiniFS::displayFile(char filename[])
 {
+    return 1;
 }
 
 int MiniFS::moreDisplayFile(char filename[])
 {
+    return 1;
 }
 
 int MiniFS::showAttribute(char filename[])
 {
+    return 1;
 }
 
-int MiniFS::showHelp(int mode = 0)
+int MiniFS::showHelp(int mode)
 {
+    return 1;
 }
 
 int MiniFS::makeDir(char filename[])
 {
+    return 1; 
 }

@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\mfs_algorithm.h">
+    <ClInclude Include="mfs_algorithm.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\mfs_coresystem.h">
+    <ClInclude Include="mfs_coresystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\mini_file_system.h">
+    <ClInclude Include="mfs_define.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\mfs_define.h">
+    <ClInclude Include="mini_file_system.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\mfs_algorithm.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\main.cpp">
+    <ClCompile Include="mfs_algorithm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\mfs_coresystem.cpp">
+    <ClCompile Include="mfs_coresystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
