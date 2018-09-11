@@ -1,48 +1,78 @@
-ï»¿//
+//
 //	mfs_cs_spaceop.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	Class MiniFS: This file implements rewriting control information of space.
 //
-#pragma warning(disable:4996)
+#pragma warning (disable:4996)
 #include "mini_file_system.h"
 
 
-/// <summary> åˆ›å»ºç©ºé—´ </summary>
-/// <return> -1:ç©ºé—´åé‡å¤; 1:åˆ›å»ºæˆåŠŸ </return>
+
+/// <summary> ´´½¨¿Õ¼ä </summary>
+/// <return> -1:¿Õ¼äÂ·¾¶´íÎó; -2:¿Õ¼äÃû³¤¶È³¬ÏŞ; -3:¿Õ¼äÃûÖØ¸´; 1:´´½¨³É¹¦ </return>
 int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 {
-	// åˆ¤æ–­æ­¤ä½ç½®æ˜¯å¦æœ‰åŒåæ–‡ä»¶
+	std::vector<std::string> path;
+	std::string spacedir = "";
+
+	MfsAlg::cutPath(name, path);
+	for (int i = 0; i < (int)path.size() - 1; i++)
+		spacedir += path[i] + "\\";
+
+	// ¼ì²âÂ·¾¶ÊÇ·ñÕıÈ·
+	if (spacedir != ""){
+		struct stat buf;
+		const char* dirname = spacedir.data();
+		int result = stat(dirname, &buf);
+		if ((_S_IFDIR & buf.st_mode) != _S_IFDIR)
+			return -1;
+	}
+
+	// ¼ì²â¿Õ¼äÃûµÄÂ·¾¶£¬¿Õ¼äÃû³¤¶È
+	const char* spacename = path[path.size() - 1].data();
+	if (strlen(spacename) > 24)
+		return -2;
+
+	// ÅĞ¶Ï´ËÎ»ÖÃÊÇ·ñÓĞÍ¬ÃûÎÄ¼ş
 	FILE * fp = fopen(name, "r");
 	if (fp != NULL) {
 		fclose(fp);
-		return -1;
+		return -3;
 	}
-
-	// åˆ›å»ºç©ºé—´
+	
+	// ´´½¨¿Õ¼ä
 	space_fp = fopen(name, "wb+");
-	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_SET);
+	//fseek(space_fp, 0L, SEEK_SET);
+	//uint_64 size_B = (uint_64)space_size * 1024 * 1024 - 1;
+	/*
+	while (size_B > 2e30) {
+	fseek(space_fp, 2e30L, SEEK_CUR);
+	size_B -= 2e30;
+	}
+	*/
+	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_CUR);
 	fwrite("\0", 1, 1, space_fp);
 	fclose(space_fp);
 
-	// åˆå§‹åŒ–ç©ºé—´ä¿¡æ¯
+	// ³õÊ¼»¯¿Õ¼äĞÅÏ¢
 	space_fp = fopen(name, "rb+");
 
-	// å†™å…¥mbr
-	strcpy(mbr.space_name, name);
+	// Ğ´Èëmbr
+	strcpy(mbr.space_name, spacename);
 	mbr.space_size = space_size;
 	mbr.cluster_size = cluster_size;
 	mbr.cluster_num = space_size * 1024 / cluster_size;
 	mbr.CAB_entrance = 1;
-	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0*mbr.cluster_size));
-	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
+	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0 * mbr.cluster_size));
+	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0 * mbr.cluster_size));
 	mbr.create_time = time(NULL);
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
-	// MBRå†™å›ç¡¬ç›˜
+	// MBRĞ´»ØÓ²ÅÌ
 	writeMBR();
 
-	// é‡æ–°å¼€è¾ŸCABå†…å­˜ç©ºé—´å¹¶å†™å›
+	// ÖØĞÂ¿ª±ÙCABÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	for (uint_32 i = 0; i <= mbr.RDF_entrance; i++) {
@@ -51,7 +81,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	writeCAB();
 	free(CAB);
 
-	// é‡æ–°å¼€è¾ŸFATå†…å­˜ç©ºé—´å¹¶å†™å›
+	// ÖØĞÂ¿ª±ÙFATÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
 	FAT[0] = ECOF;
 	for (uint_32 i = mbr.CAB_entrance; i < mbr.FAT_entrance - 1; i++) {
@@ -66,35 +96,40 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	writeFAT();
 	free(FAT);
 
-	// æ–°å»ºæ ¹ç›®å½•æ–‡ä»¶å¹¶å†™å…¥ç¡¬ç›˜
-	Directory creat_directory;
-	strcpy(creat_directory.header.name, mbr.space_name);
-	creat_directory.header.occupy_cluster_num = 1;
-	creat_directory.header.current_dir_entrance = mbr.RDF_entrance;
-	creat_directory.header.parent_dir_entrance = mbr.RDF_entrance;
-	creat_directory.header.file_num = 0;
-	creat_directory.header.create_time = mbr.create_time;
-	creat_directory.header.modify_time = mbr.create_time;
-	creat_directory.header.folder_size = sizeof(DFH);
-	creat_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
-	rewriteDirectory(creat_directory);
-	free(creat_directory.fcb);
+	// ĞÂ½¨¸ùÄ¿Â¼ÎÄ¼ş²¢Ğ´ÈëÓ²ÅÌ
+	Directory create_directory;
+	strcpy(create_directory.header.name, mbr.space_name);
+	create_directory.header.occupy_cluster_num = 1;
+	create_directory.header.current_dir_entrance = mbr.RDF_entrance;
+	create_directory.header.parent_dir_entrance = mbr.RDF_entrance;
+	create_directory.header.file_num = 0;
+	create_directory.header.create_time = mbr.create_time;
+	create_directory.header.modify_time = mbr.create_time;
+	create_directory.header.folder_size = 0;
+	create_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
+	newWriteDirectory(create_directory);
+	free(create_directory.fcb);
 
 	fclose(space_fp);
 	space_fp = NULL;
 	return 1;
 }
 
-/// <summary> æ‰“å¼€ç©ºé—´ </summary>
-/// <return> -1:æ‰“å¼€å¤±è´¥; 1:æ‰“å¼€æˆåŠŸ </return>
+/// <summary> ´ò¿ª¿Õ¼ä </summary>
+/// <return> -1:´ò¿ªÊ§°Ü; 1:´ò¿ª³É¹¦ </return>
 int MiniFS::mountSpace(char name[])
 {
-	space_fp = fopen(name, "r");
-	if (space_fp == NULL) return -1;
-	fclose(space_fp);
+	FILE * fp = fopen(name, "r");
+	if (fp == NULL) {
+		return -1;
+	}
+	fclose(fp);
+
 	space_fp = fopen(name, "rb+");
+	mount_flag = true;
 
 	readMBR();
+	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	readCAB();
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
@@ -102,40 +137,42 @@ int MiniFS::mountSpace(char name[])
 	Directory current_directory = readDirectory(mbr.RDF_entrance);
 	directory.push_back(current_directory);
 
+	// ¸ÄĞ´ÎÄ¼ş»º³åÇø´óĞ¡
+	buffer = calloc(mbr.cluster_size, 1024);
+
 	return 1;
 }
 
-/// <summary> æ ¼å¼åŒ–ç©ºé—´ </summary>
-/// <param name="cluster_size"> æ–‡ä»¶ç³»ç»Ÿå•ç°‡å¤§å° </param>
-/// <return> 1:æ ¼å¼åŒ–æˆåŠŸ; -1:æ ¼å¼åŒ–å¤±è´¥ </return>
+/// <summary> ¸ñÊ½»¯¿Õ¼ä </summary>
+/// <param name="cluster_size"> ÎÄ¼şÏµÍ³µ¥´Ø´óĞ¡ </param>
+/// <return> 1:¸ñÊ½»¯³É¹¦; -1:¸ñÊ½»¯Ê§°Ü </return>
 int MiniFS::formatSpace(uint_32 cluster_size)
 {
-	// æ”¹å†™MBR
+	// ¸ÄĞ´MBR
+	/*	CABÎÄ¼şÕ¼ÓÃ´ØÊı Îª ¡¾ ´ØÊı / µ¥´Ø´óĞ¡(KB) / 8192 ¡¿
+		FATÎÄ¼şÕ¼ÓÃ´ØÊı Îª ¡¾ ´ØÊı / µ¥´Ø´óĞ¡(KB) / 256 ¡¿	 */
 	mbr.cluster_size = cluster_size;
 	mbr.cluster_num = mbr.space_size * 1024 / mbr.cluster_size;
 	mbr.CAB_entrance = 1;
-	// CABæ–‡ä»¶å ç”¨ç°‡æ•° ä¸º ã€ ç°‡æ•° / å•ç°‡å¤§å°(KB) / 8192 ã€‘
 	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0*mbr.cluster_size));
-	// FATæ–‡ä»¶å ç”¨ç°‡æ•° ä¸º ã€ ç°‡æ•° / å•ç°‡å¤§å°(KB) / 256 ã€‘
 	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
 
-	// MBRå†™å›ç¡¬ç›˜
+	// MBRĞ´»ØÓ²ÅÌ
 	writeMBR();
 
-	// é‡æ–°å¼€è¾ŸCABå†…å­˜ç©ºé—´å¹¶å†™å›
+	// ÖØĞÂ¿ª±ÙCABÄÚ´æ¿Õ¼ä²¢Ğ´»Ø
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
-
 	free(CAB);
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	writeCAB();
 
-	// é‡æ–°å¼€è¾ŸFATå†…å­˜ç©ºé—´
+	// ÖØĞÂ¿ª±ÙFATÄÚ´æ¿Õ¼ä
 	free(FAT);
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
 	writeFAT();
 
-	// æ¸…ç©ºæ–‡ä»¶ç›®å½•å¹¶å°†æ ¹ç›®å½•æ–‡ä»¶å†™å›
+	// Çå¿ÕÎÄ¼şÄ¿Â¼²¢½«¸ùÄ¿Â¼ÎÄ¼şĞ´»Ø
 	directory.clear();
 	Directory format_directory;
 	strcpy(format_directory.header.name, mbr.space_name);
@@ -147,29 +184,40 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	format_directory.header.modify_time = time(NULL);
 	format_directory.header.folder_size = sizeof(DFH);
 	format_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
-	rewriteDirectory(format_directory);
+	newWriteDirectory(format_directory);
 	directory.push_back(format_directory);
 	free(format_directory.fcb);
 
-	// æ”¹å†™æ–‡ä»¶ç¼“å†²åŒºå¤§å°
+	// ¸ÄĞ´ÎÄ¼ş»º³åÇø´óĞ¡
 	buffer = realloc(buffer, mbr.cluster_size * 1024);
 
 	return 1;
 }
 
+
+/// <summary> ¹Ø±Õµ±Ç°¿Õ¼ä </summary>
+/// <return> -1:¹Ø±ÕÊ§°Ü,µ±Ç°Î´´ò¿ªÈÎºÎ¿Õ¼ä; 1:¹Ø±Õµ±Ç°¿Õ¼ä³É¹¦ </return>
 int MiniFS::closeSpace(void)
 {
-	writeMBR();
+	if (!mount_flag) return -1;
 
+	writeMBR();
 	writeCAB();
 	free(CAB);
-
 	writeFAT();
 	free(FAT);
-
 	free(buffer);
-	directory.clear();
-	fclose(space_fp);
 
+	std::vector<Directory>::iterator iter;
+	Directory cur_dir;
+	for (iter = directory.begin(); iter != directory.end(); iter++) {
+		cur_dir = (*iter);
+		free(cur_dir.fcb);
+	}
+	directory.clear();
+
+	fclose(space_fp);
+	space_fp = NULL;
+	mount_flag = false;
 	return 1;
 }

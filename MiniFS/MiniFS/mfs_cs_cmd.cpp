@@ -1,4 +1,4 @@
-ï»¿//
+//
 //	mfs_cs_cmd.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -8,84 +8,35 @@
 
 #include "mini_file_system.h"
 
-std::string command_array[] = {"create","mount","fmt","dr","cp","dl","att","help","close","end","mkdir"};
-int command_distance[11];
-typedef std::vector<int> TX;
-typedef std::vector<TX> Tmatrix;
+std::string command_array[] = { "create", "mount", "fmt", "dr", "cp", "dl", "att", "help", "close", "end", "mkdir" ,"tree", "move", "lrb", "crb" };
+int command_distance[15];
 
-// ç¼–è¾‘è·ç¦»ç®—æ³• è®¡ç®—è¾“å…¥å‘½ä»¤ä¸å·²æœ‰å‘½ä»¤å‚æ•°ç›¸ä¼¼åº¦ ä»è€Œåœ¨è¾“å…¥å‘½ä»¤é”™è¯¯æ—¶ç»™å‡ºæ¨èè¾“å…¥å‘½ä»¤
-int ldistance(const std::string source, const std::string target)
+void MiniFS::printFilePath(void)
 {
-    //step 1
-    int n = source.length();
-    int m = target.length();
-    if (m == 0)
-        return n;
-    if (n == 0)
-        return m;
-
-    Tmatrix matrix(n + 1);
-    for (int i = 0; i <= n; i++)
-        matrix[i].resize(m + 1);
-    //step 2 Initialize
-    for (int i = 1; i <= n; i++)
-        matrix[i][0] = i;
-    for (int i = 1; i <= m; i++)
-        matrix[0][i] = i;
-    //step 3
-    for (int i = 1; i <= n; i++)
-    {
-        const char si = source[i - 1];
-        //step 4
-        for (int j = 1; j <= m; j++)
-        {
-            const char dj = target[j - 1];
-            //step 5
-            int cost;
-            if (si == dj)
-            {
-                cost = 0;
-            }
-            else
-            {
-                cost = 1;
-            }
-            //step 6
-            const int above = matrix[i - 1][j] + 1;
-            const int left = matrix[i][j - 1] + 1;
-            const int diag = matrix[i - 1][j - 1] + cost;
-            matrix[i][j] = std::min(above, std::min(left, diag));
-        }
-    } //step7
-    return matrix[n][m];
-}
-
-inline void MiniFS::printFilePath(void)
-{
-	printf("Mini-FS:");
+	printf("\nMini-FS:");
 	std::vector<Directory>::iterator iter;
 	for (iter = directory.begin(); iter != directory.end(); iter++)
 		printf("\\%s", (*iter).header.name);
 	putchar('>');
-} 
+}
 
 int MiniFS::cmd(void)
 {
-    this->printFilePath();
+	this->printFilePath();
 	char delim = ' ';
 	std::string input_temp = "";
 	std::string command_input = "";
 
-	// æ¯æ¬¡åªè¯»å–ä¸€è¡Œå‘½ä»¤ï¼Œå¤šæ¬¡è¾“å…¥ç”±å¤–ç•Œå¾ªç¯æ§åˆ¶
+	// Ã¿´ÎÖ»¶ÁÈ¡Ò»ĞĞÃüÁî£¬¶à´ÎÊäÈëÓÉÍâ½çÑ­»·¿ØÖÆ
 	std::getline(std::cin, command_input);
 
-	// é˜²æ­¢ç©ºè¾“å…¥
+	// ·ÀÖ¹¿ÕÊäÈë
 	if ((command_input[0] == ' ' && command_input.length() == 1) || command_input.length() < 1)
 		return 1;
 
-	// å»é™¤å¤šä½™çš„ç©ºæ ¼
+	// È¥³ı¶àÓàµÄ¿Õ¸ñ
 	bool space_flag = true;
-	for (int i = 0; i < command_input.length(); i++)
+	for (int i = 0; i < (int)command_input.length(); i++)
 	{
 		if (command_input[i] == ' ')
 		{
@@ -104,11 +55,11 @@ int MiniFS::cmd(void)
 	else
 		command_input = input_temp;
 
-	// é˜²æ­¢ç©ºè¾“å…¥
+	// ·ÀÖ¹¿ÕÊäÈë
 	if ((command_input[0] == ' ' && command_input.length() == 1) || command_input.length() < 1)
 		return 1;
 
-	// æŒ‰ç©ºæ ¼ ' ' åˆ‡åˆ†è¾“å…¥çš„ä¸€è¡Œå­—ç¬¦ä¸²
+	// °´¿Õ¸ñ ' ' ÇĞ·ÖÊäÈëµÄÒ»ĞĞ×Ö·û´®
 	std::vector<std::string> command_vector;
 	command_vector.clear();
 	std::istringstream iss(command_input);
@@ -120,79 +71,77 @@ int MiniFS::cmd(void)
 	int command_num = command_vector.size();
 	std::string command = command_vector[0];
 
-	int handle_re; // æ¥æ”¶å„å‘½ä»¤å…·ä½“å¤„ç†å‡½æ•°çš„è¿”å›å€¼
-
-	// example: create space_name; space_name å¯ä»¥åŒ…å«è·¯å¾„
+	// example: create space_name; space_name ¿ÉÒÔ°üº¬Â·¾¶   ok
 	if (command == "create")
 	{
 		if (command_num == 2)
 		{
-            if (this->createSpace((char *)command_vector[1].data(), 1024, 4) == 1)
-                std::cout << "ç©ºé—´åˆ›å»ºæˆåŠŸ!" << std::endl;
-            else
-                std::cout << "æ–‡ä»¶åå·²å­˜åœ¨!" << std::endl;
+			if (this->createSpace((char *)command_vector[1].data(), 1024, 4) == 1)
+				std::cout << "¿Õ¼ä´´½¨³É¹¦!" << std::endl;
+			else
+				std::cout << "¿Õ¼äÒÑ´æÔÚ!" << std::endl;
 		}
 		else if (command_num == 3)
 		{
-			std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$"); // ç©ºé—´å¤§å°å¿…é¡»ä¸ºé0æ•´æ•°
+			std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$"); // ¿Õ¼ä´óĞ¡±ØĞëÎª·Ç0ÕûÊı
 			if (!std::regex_match(command_vector[2], reg_pattern_space_size))
 			{
-				std::cout << command_vector[2] << " ä¸æ˜¯éé›¶æ•´æ•°!" << std::endl;
+				std::cout << command_vector[2] << " ²»ÊÇ·ÇÁãÕûÊı!" << std::endl;
 				return 1;
 			}
 
 			int space_size = atoi((char *)command_vector[2].data());
 			if (space_size < 128 || space_size > 2048)
 			{
-				std::cout << command_vector[2] << " ä¸èƒ½å°äº 128 æˆ–å¤§äº 2048!" << std::endl;
-                return 1;
+				std::cout << command_vector[2] << " ²»ÄÜĞ¡ÓÚ 128 »ò´óÓÚ 2048!" << std::endl;
+				return 1;
 			}
 
-            if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, 4) == 1)
-                std::cout << "ç©ºé—´åˆ›å»ºæˆåŠŸ!" << std::endl;
-            else
-                std::cout << "æ–‡ä»¶åå·²å­˜åœ¨!" << std::endl;
+			if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, 4) == 1)
+				std::cout << "¿Õ¼ä´´½¨³É¹¦!" << std::endl;
+			else
+				std::cout << "¿Õ¼äÒÑ´æÔÚ!" << std::endl;
 		}
-        else if (command_num == 4)
-        {
-            std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$");
-            if (!std::regex_match(command_vector[2], reg_pattern_space_size))
-            {
-                std::cout << command_vector[2] << " ä¸æ˜¯éé›¶æ•´æ•°!" << std::endl;
-                return 1;
-            }
+		else if (command_num == 4)
+		{
+			std::regex reg_pattern_space_size("^\\+?[1-9][0-9]*$");
+			if (!std::regex_match(command_vector[2], reg_pattern_space_size))
+			{
+				std::cout << command_vector[2] << " ²»ÊÇ·ÇÁãÕûÊı!" << std::endl;
+				return 1;
+			}
 
-            int space_size = atoi((char *)command_vector[2].data());
-            if (space_size < 128 || space_size > 2048)
-            {
-                std::cout << command_vector[2] << " ä¸èƒ½å°äº 128 æˆ–å¤§äº 2048!" << std::endl;
-                return 1;
-            }
+			int space_size = atoi((char *)command_vector[2].data());
+			if (space_size < 128 || space_size > 2048)
+			{
+				std::cout << command_vector[2] << " ²»ÄÜĞ¡ÓÚ 128 »ò´óÓÚ 2048!" << std::endl;
+				return 1;
+			}
 
-            std::regex reg_pattern_cluster_size("^\\+?[1-9][0-9]*$");
-            if (!std::regex_match(command_vector[3], reg_pattern_cluster_size))
-            {
-                std::cout << command_vector[3] << " ä¸æ˜¯éé›¶æ•´æ•°!" << std::endl;
-                return 1;
-            }
+			std::regex reg_pattern_cluster_size("^\\+?[1-9][0-9]*$");
+			if (!std::regex_match(command_vector[3], reg_pattern_cluster_size))
+			{
+				std::cout << command_vector[3] << " ²»ÊÇ·ÇÁãÕûÊı!" << std::endl;
+				return 1;
+			}
 
-            int cluster_size = atoi((char *)command_vector[3].data());
-            if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
-            {
-                std::cout << command_vector[3] << " ä¸æ˜¯å»ºè®®å‚æ•°!(åº”{x|1<=x<=64 ä¸” xä¸º2çš„å¹‚æ¬¡æ–¹})" << std::endl;
-                return 1;
-            }
+			int cluster_size = atoi((char *)command_vector[3].data());
+			if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
+			{
+				std::cout << command_vector[3] << " ²»ÊÇ½¨Òé²ÎÊı!(Ó¦{x|1<=x<=64 ÇÒ xÎª2µÄÃİ´Î·½})" << std::endl;
+				return 1;
+			}
 
-            if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, (uint_32)cluster_size) == 1)
-                std::cout << "ç©ºé—´åˆ›å»ºæˆåŠŸ!" << std::endl;
-            else
-                std::cout << "æ–‡ä»¶åå·²å­˜åœ¨!" << std::endl;
-        }
+			if (this->createSpace((char *)command_vector[1].data(), (uint_32)space_size, (uint_32)cluster_size) == 1)
+				std::cout << "¿Õ¼ä´´½¨³É¹¦!" << std::endl;
+			else
+				std::cout << "¿Õ¼äÒÑ´æÔÚ!" << std::endl;
+		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: mount space_name; space_name å¯ä»¥åŒ…å«è·¯å¾„ ok
+	// example: mount space_name; space_name ¿ÉÒÔ°üº¬Â·¾¶ ok
 	else if (command == "mount")
 	{
 		if (command_num == 2)
@@ -200,65 +149,90 @@ int MiniFS::cmd(void)
 			std::ifstream ifs(command_vector[1].c_str());
 			if (ifs)
 			{
-                if (this->mountSpace((char *)command_vector[1].data()) != 1)
-                    std::cout << command_vector[1] << " æ‰“å¼€å¤±è´¥!" << std::endl;
-                else
-                    this->if_open = true;
+				if (this->mountSpace((char *)command_vector[1].data()) != 1)
+					std::cout << command_vector[1] << " ´ò¿ªÊ§°Ü!" << std::endl;
+				else
+					this->mount_flag = true;
 			}
 			else
-				std::cout << command_vector[1] << " ä¸å­˜åœ¨æ­¤è·¯å¾„!" << std::endl;
+				std::cout << command_vector[1] << " ²»´æÔÚ´ËÂ·¾¶!" << std::endl;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: dr; æ˜¾ç¤ºå½“å‰æ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶ç›®å½•
+	// example: dr; ÏÔÊ¾µ±Ç°ÎÄ¼ş¼ĞÏÂµÄÎÄ¼şÄ¿Â¼  ok
 	else if (command == "dr")
 	{
-        if (command_num == 1)
-            this->showDirectory();
-        else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+		if (command_num == 1) {
+			if (!this->mount_flag)
+			{
+				std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+				return 1;
+			}
+			this->showDirectory();
+		}
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: cp filename_old filename_new;
-	// æœ‰ä»å¤–éƒ¨ç³»ç»Ÿ->Mini-FSã€Mini-FS->å¤–éƒ¨ç³»ç»Ÿã€Mini-FS->Mini-FSä¸‰ç§æƒ…å†µ
+	// example: cp filename_old filename_new;  ok
+	// ÓĞ´ÓÍâ²¿ÏµÍ³->Mini-FS¡¢Mini-FS->Íâ²¿ÏµÍ³¡¢Mini-FS->Mini-FSÈıÖÖÇé¿ö
 	else if (command == "cp")
 	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
 		if (command_num == 3)
 		{
-			// åˆ¤æ–­ filename_old filename_new çš„åˆæ³•æ€§
-			std::cout << command_vector[1] << command_vector[2] << std::endl;
+			if (this->copyFile((char *)command_vector[1].data(), (char *)command_vector[2].data()) != 1)
+				std::cout << "¿½±´ÎÄ¼şÊ§°Ü!" << std::endl;
+			else
+				std::cout << "³É¹¦¿½±´ÎÄ¼ş!" << std::endl;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: dl filename; åˆ é™¤ç©ºé—´ä¸­çš„æ–‡ä»¶
+	// example: dl filename; É¾³ı¿Õ¼äÖĞµÄÎÄ¼ş  ok
 	else if (command == "dl")
 	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
 		if (command_num == 2)
 		{
-			// åˆ¤æ–­ filename çš„åˆæ³•æ€§
-            std::cout << command_vector[1] << std::endl;
+			if (this->deleteFile((char *)command_vector[1].data()) != 1)
+				std::cout << "É¾³ıÎÄ¼şÊ§°Ü!" << std::endl;
+			else
+				std::cout << "³É¹¦É¾³ıÎÄ¼ş!" << std::endl;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: att filename; æ˜¾ç¤ºæ–‡ä»¶å±æ€§
+	// example: att filename; ÏÔÊ¾ÎÄ¼şÊôĞÔ  ok
 	else if (command == "att")
 	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
 		if (command_num == 2)
 		{
-			// åˆ¤æ–­ filename çš„åˆæ³•æ€§
-			std::cout << command_vector[1] << std::endl;
+			if (this->showAttribute((char *)command_vector[1].data()) != 1)
+				std::cout << "²éÕÒÎÄ¼şÊ§°Ü!" << std::endl;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: help [å‘½ä»¤å(å¯é€‰)];   ok
+	// example: help [ÃüÁîÃû(¿ÉÑ¡)];   ok
 	else if (command == "help")
 	{
 		if (command_num == 1)
@@ -267,176 +241,242 @@ int MiniFS::cmd(void)
 		}
 		else if (command_num == 2)
 		{
-			if (command_vector[1] == "create")
-				this->showHelp(1);
-			else if (command_vector[1] == "mount")
-				this->showHelp(2);
-			else if (command_vector[1] == "fmt")
-				this->showHelp(3);
-			else if (command_vector[1] == "close")
-				this->showHelp(4);
-			else if (command_vector[1] == "dr")
-				this->showHelp(5);
-			else if (command_vector[1] == "cp")
-				this->showHelp(6);
-			else if (command_vector[1] == "dl")
-				this->showHelp(7);
-			else if (command_vector[1] == "tp")
-				this->showHelp(8);
-			else if (command_vector[1] == "more")
-				this->showHelp(9);
-			else if (command_vector[1] == "att")
-				this->showHelp(10);
-			else if (command_vector[1] == "help")
-				this->showHelp(11);
+            if (command_vector[1] == "create")
+                this->showHelp(1);
+            else if (command_vector[1] == "mount")
+                this->showHelp(2);
+            else if (command_vector[1] == "fmt")
+                this->showHelp(3);
+            else if (command_vector[1] == "close")
+                this->showHelp(4);
+            else if (command_vector[1] == "dr")
+                this->showHelp(5);
+            else if (command_vector[1] == "cp")
+                this->showHelp(6);
+            else if (command_vector[1] == "dl")
+                this->showHelp(7);
+            else if (command_vector[1] == "tree")
+                this->showHelp(8);
+            else if (command_vector[1] == "move")
+                this->showHelp(9);
+            else if (command_vector[1] == "att")
+                this->showHelp(10);
+            else if (command_vector[1] == "help")
+                this->showHelp(11);
+            else if (command_vector[1] == "end")
+                this->showHelp(12);
+            else if (command_vector[1] == "mkdir")
+                this->showHelp(13);
+            else if (command_vector[1] == "touch")
+                this->showHelp(14);
+            else if (command_vector[1] == "lrb")
+                this->showHelp(15);
+            else if (command_vector[1] == "crb")
+                this->showHelp(16);
+            else if (command_vector[1] == "map")
+                this->showHelp(17);
 			else
-				std::cout << command_vector[1] << " ä¸æ˜¯ä¸€ä¸ªæ­£ç¡®çš„å‘½ä»¤åç§°!" << std::endl;
+				std::cout << command_vector[1] << " ²»ÊÇÒ»¸öÕıÈ·µÄÃüÁîÃû³Æ!" << std::endl;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: close;  å…³é—­å½“å‰ç©ºé—´  ok
+	// example: close;  ¹Ø±Õµ±Ç°¿Õ¼ä  ok
 	else if (command == "close")
 	{
 		if (command_num == 1)
 		{
-            if (!this->if_open)
-            {
-                std::cout << "å½“å‰æ²¡æœ‰æ‰“å¼€ç©ºé—´!" << std::endl;
-                return 1;
-            }
+			if (!this->mount_flag)
+			{
+				std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+				return 1;
+			}
 
-			this->closeSpace(); // éœ€è¦åšä¸€äº›å›å†™æ“ä½œ
-            this->if_open = false;
+			this->closeSpace(); // ĞèÒª×öÒ»Ğ©»ØĞ´²Ù×÷
+			this->mount_flag = false;
 		}
 		else
-			std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-	// example: fmt [size(å¯é€‰)]; æ ¼å¼åŒ–å½“å‰ç©ºé—´  ok
+	// example: fmt [size(¿ÉÑ¡)]; ¸ñÊ½»¯µ±Ç°¿Õ¼ä  ok
 	else if (command == "fmt")
 	{
-        if (command_num == 1)
-        {
-            if (!this->if_open)
-            {
-                std::cout << "å½“å‰æ²¡æœ‰æ‰“å¼€ç©ºé—´!" << std::endl;
-                return 1;
-            }
-            this->formatSpace(); // é»˜è®¤ä¸º 4
-            std::cout << "æ ¼å¼åŒ–æˆåŠŸ!" << std::endl;
-        }
-        else if (command_num == 2)
-        {
-            std::regex reg_pattern_size("^\\+?[1-9][0-9]*$");  // é0æ•´æ•°
-            if (!std::regex_match(command_vector[1], reg_pattern_size))
-            {
-                std::cout << command_vector[1] << " ä¸æ˜¯éé›¶æ•´æ•°!" << std::endl;
-                return 1;
-            }
+		if (command_num == 1)
+		{
+			if (!this->mount_flag)
+			{
+				std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+				return 1;
+			}
+			this->formatSpace(); // Ä¬ÈÏÎª 4
+			std::cout << "¸ñÊ½»¯³É¹¦!" << std::endl;
+		}
+		else if (command_num == 2)
+		{
+			std::regex reg_pattern_size("^\\+?[1-9][0-9]*$");  // ·Ç0ÕûÊı
+			if (!std::regex_match(command_vector[1], reg_pattern_size))
+			{
+				std::cout << command_vector[1] << " ²»ÊÇ·ÇÁãÕûÊı!" << std::endl;
+				return 1;
+			}
 
-            int cluster_size = atoi((char *)command_vector[1].data());
-            if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
-            {
-                std::cout << command_vector[1] << " ä¸æ˜¯å»ºè®®å‚æ•°!(åº”{x|1<=x<=64 ä¸” xä¸º2çš„å¹‚æ¬¡æ–¹})" << std::endl;
-                return 1;
-            }
+			int cluster_size = atoi((char *)command_vector[1].data());
+			if ((cluster_size & (cluster_size - 1)) || cluster_size > 64)
+			{
+				std::cout << command_vector[1] << " ²»ÊÇ½¨Òé²ÎÊı!(Ó¦{x|1<=x<=64 ÇÒ xÎª2µÄÃİ´Î·½})" << std::endl;
+				return 1;
+			}
 
-            this->formatSpace((uint_32)cluster_size);
-            std::cout << "æ ¼å¼åŒ–æˆåŠŸ!" << std::endl;
-        }
-        else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+			this->formatSpace((uint_32)cluster_size);
+			std::cout << "¸ñÊ½»¯³É¹¦!" << std::endl;
+		}
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
 	}
 
-    // example: end; é€€å‡ºç¨‹åº  ok
-    else if (command == "end")
+	// example: end; ÍË³ö³ÌĞò  ok
+	else if (command == "end")
+	{
+		if (command_num == 1)
+			return 0;
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+	}
+
+	// example: mkdir <name>; ´´½¨ÃûÎª name ÎÄ¼ş¼Ğ  ok
+	else if (command == "mkdir")
+	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
+		if (command_num == 2)
+		{
+			if (command_vector[1].length() > 8)
+			{
+				std::cout << "´´½¨" << command_vector[1] << " Ê§°Ü£¬ÎÄ¼ş¼ĞÃû³Æ¹ı³¤!" << std::endl;
+				return 1;
+			}
+
+			if (this->makeDir((char *)command_vector[1].data()) == -1)
+				std::cout << command_vector[1] << " ÎÄ¼ş¼ĞÖØÃû!" << std::endl;
+		}
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+	}
+
+	// example: cd <dirname>; ÒÆ¶¯µ½ dirname ÎÄ¼ş¼Ğ  ok
+	else if (command == "cd")
+	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
+		if (command_num == 2)
+		{
+			if (this->changeDirectory((char *)command_vector[1].data()) != 1)
+				std::cout << command_vector[1] << " ²»´æÔÚ!" << std::endl;
+		}
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+	}
+
+	// example: touch filename; ´´½¨ filename ÎÄ¼ş  ok
+	else if (command == "touch")
+	{
+		if (!this->mount_flag)
+		{
+			std::cout << "µ±Ç°Ã»ÓĞ´ò¿ª¿Õ¼ä!" << std::endl;
+			return 1;
+		}
+		if (command_num == 2)
+		{
+			if (command_vector[1].length() > 12)
+			{
+				std::cout << "´´½¨" << command_vector[1] << " Ê§°Ü£¬ÎÄ¼şÃû³Æ¹ı³¤!" << std::endl;
+				return 1;
+			}
+
+			if (this->createFile((char *)command_vector[1].data()) == -1)
+				std::cout << command_vector[1] << " ÎÄ¼şÖØÃû!" << std::endl;
+		}
+		else
+			std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+	}
+
+    // example: tree; ´òÓ¡Ä¿Â¼Ê÷   ok
+    else if (command == "tree")
     {
         if (command_num == 1)
-            return 0;
+            this->treeDirectory();
         else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+            std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
     }
 
-    // example: mkdir <name>; åˆ›å»ºåä¸º name æ–‡ä»¶å¤¹
-    else if (command == "mkdir")
+    // example: lrb; ÏÔÊ¾»ØÊÕÕ¾
+    else if (command == "lrb")
+    {
+        if (command_num == 1)
+            this->showRecycleBin();
+        else
+            std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+    }
+    
+    // example: crb; Çå¿Õ»ØÊÕÕ¾
+	/*
+    else if (command == "crb")
+    {
+        if (command_num == 1)
+            this->emptyRecycleBin();
+        else
+            std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
+    }*/
+
+    // example: map; ²é¿´ÎÄ¼şÊ¹ÓÃ¿éºÅ
+    else if (command == "map")
     {
         if (command_num == 2)
         {
-            if (command_vector[1].length() > 8)
-            {
-                std::cout << "åˆ›å»º" << command_vector[1] << " å¤±è´¥ï¼Œæ–‡ä»¶å¤¹åç§°è¿‡é•¿!" << std::endl;
-                return 1;
-            }
-
-            if (this->makeDir((char *)command_vector[1].data()) == -1)
-                std::cout << command_vector[1] << " æ–‡ä»¶å¤¹é‡å!" << std::endl;
+            if (this->occupyCluster((char *)command_vector[1].data()) != 1)
+                std::cout << "²éÕÒÎÄ¼şÊ§°Ü!" << std::endl;
         }
         else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
+            std::cout << command << " ²ÎÊı´íÎó!" << std::endl;
     }
-
-    // example: cd <dirname>; ç§»åŠ¨åˆ° dirname æ–‡ä»¶å¤¹
-    else if (command == "cd")
-    {
-        if (command_num == 2)
-        {
-           // if (this->changeDirectory((char *)command_vector[1].data()) != 1)
-           //     std::cout << command_vector[1] << " ä¸å­˜åœ¨!" << std::endl;
-        }
-        else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
-    }
-
-    // example: touch filename; åˆ›å»º filename æ–‡ä»¶
-    else if (command == "touch")
-    {
-        if (command_num == 2)
-        {
-            if (command_vector[1].length() > 12)
-            {
-                std::cout << "åˆ›å»º" << command_vector[1] << " å¤±è´¥ï¼Œæ–‡ä»¶åç§°è¿‡é•¿!" << std::endl;
-                return 1;
-            }
-
-            if (this->createFile((char *)command_vector[1].data()) == -1)
-                std::cout << command_vector[1] << " æ–‡ä»¶é‡å!" << std::endl;
-        }
-        else
-            std::cout << command << " å‚æ•°é”™è¯¯!" << std::endl;
-    }
-
-    else
-    {
-        std::cout << command << " ä¸æ˜¯ä¸€ä¸ªæ­£ç¡®çš„å‘½ä»¤!" << std::endl;
-        bool if_dis = false;
-        for (int i = 0; i < 11; i++)
-        {
-            command_distance[i]= ldistance(command, command_array[i]);
-            if (command_distance[i] < 3)
-                if_dis = true;
-        }
-        if (!if_dis)
-            return 1;
-        std::cout << "æ‚¨æ˜¯æƒ³è¾“å…¥ ";
-        bool dis_flag = false;
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 11; j++)
-            {
-                if (command_distance[j] == i)
-                {
-                    std::cout << command_array[j] << " ";
-                    if (i <= 0)
-                        dis_flag = true;
-                }
-            }
-            if (dis_flag)
-                break;
-        }
-        std::cout << "å‘½ä»¤å—?" << std::endl;
-    }
+	else
+	{
+		std::cout << command << " ²»ÊÇÒ»¸öÕıÈ·µÄÃüÁî!" << std::endl;
+		bool if_dis = false;
+		for (int i = 0; i < 15; i++)
+		{
+			command_distance[i] = MfsAlg::LevenDistance(command, command_array[i]);
+			if (command_distance[i] < 3)
+				if_dis = true;
+		}
+		if (!if_dis)
+			return 1;
+		std::cout << "ÄúÊÇÏëÊäÈë ";
+		bool dis_flag = false;
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 15; j++)
+			{
+				if (command_distance[j] == i)
+				{
+					std::cout << command_array[j] << " ";
+					if (i <= 1)
+						dis_flag = true;
+				}
+			}
+			if (dis_flag)
+				break;
+		}
+		std::cout << "ÃüÁîÂğ?" << std::endl;
+	}
 
 	return 1;
 }

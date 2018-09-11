@@ -1,4 +1,4 @@
-ï»¿//
+//
 //	mfs_cs_help.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -8,96 +8,135 @@
 
 #include "mini_file_system.h"
 
-#define HELP_OUTPUT(cmd_name, cmd_content, cmd_layout) \
-	std::cout.setf(std::ios::left);                    \
-	std::cout.fill('.');                               \
-	std::cout.width(12);                               \
-	std::cout << cmd_name;                             \
-	std::cout.fill(' ');                               \
-	std::cout.width(18);                               \
-	std::cout << cmd_content;                          \
-	std::cout << "æŒ‡ä»¤æ ¼å¼: ";                         \
-	std::cout.fill(' ');                               \
-	std::cout << cmd_layout << std::endl;              \
+
+inline void HelpOutput(const char cmd_name[], const char cmd_content[], 
+    const char cmd_layout[])
+{
+	std::cout.setf(std::ios::left);
+	std::cout.fill('.');
+	std::cout.width(12);
+	std::cout << cmd_name;
+	std::cout.fill(' ');
+	std::cout.width(18);
+	std::cout << cmd_content;
+	std::cout << "Ö¸Áî¸ñÊ½: ";
+	std::cout.fill(' ');
+	std::cout << cmd_layout << std::endl;
 	std::cout.unsetf(std::ios::left);
+}
 
-#define HELP_DETAIL(cmd_name, cmd_layout, cmd_content, cmd_example) \
-	std::cout << cmd_name << std::endl;                             \
-	std::cout << "æŒ‡ä»¤æ ¼å¼: " << cmd_layout << std::endl;           \
-	std::cout << "æŒ‡ä»¤å«ä¹‰: " << cmd_content << std::endl;          \
-	std::cout << "æŒ‡ä»¤ç¤ºä¾‹: " << cmd_example << std::endl;
-
+inline void HelpDetail(const char cmd_name[], const char cmd_layout[], 
+	const char cmd_content[], const char cmd_example[])
+{
+	std::cout << cmd_name << std::endl;
+	std::cout << "Ö¸Áî¸ñÊ½: " << cmd_layout << std::endl;
+	std::cout << "Ö¸Áîº¬Òå: " << cmd_content << std::endl;
+	std::cout << "Ö¸ÁîÊ¾Àı: " << cmd_example << std::endl;
+}
 
 void MiniFS::showHelp(int mode)
 {
+	
 	switch (mode)
 	{
 	case 0:
-		HELP_OUTPUT("create ", " åˆ›å»ºç©ºé—´", "create <name> [size(å¯é€‰)]");
-		HELP_OUTPUT("mount ", " å®‰è£…ç©ºé—´", "mount <name>");
-		HELP_OUTPUT("fmt ", " æ ¼å¼åŒ–ç©ºé—´", "fmt [size(å¯é€‰)]");
-		HELP_OUTPUT("close ", " é€€å‡ºç©ºé—´", "close");
-		HELP_OUTPUT("dr ", " æ˜¾ç¤ºç›®å½•", "dr");
-		HELP_OUTPUT("cp ", " æ‹·è´æ–‡ä»¶", "cp <name_old> <name_new>");
-		HELP_OUTPUT("dl ", " åˆ é™¤æ–‡ä»¶", "dl <name>");
-		HELP_OUTPUT("tp ", " æ˜¾ç¤ºæ–‡æœ¬æ–‡ä»¶", "tp <name>");
-		HELP_OUTPUT("more ", " åˆ†é¡µæ˜¾ç¤ºæ–‡æœ¬æ–‡ä»¶", "more <name>");
-		HELP_OUTPUT("att ", " æ˜¾ç¤ºæ–‡ä»¶å±æ€§", "att <name>");
-		HELP_OUTPUT("help ", " å¸®åŠ©ä¿¡æ¯", "help [å‘½ä»¤å(å¯é€‰)]");
+		HelpOutput("create ", " ´´½¨¿Õ¼ä", "create <name> [size(¿ÉÑ¡)]");
+		HelpOutput("mount ", " °²×°¿Õ¼ä", "mount <name>");
+		HelpOutput("fmt ", " ¸ñÊ½»¯¿Õ¼ä", "fmt [size(¿ÉÑ¡)]");
+		HelpOutput("close ", " ÍË³ö¿Õ¼ä", "close");
+		HelpOutput("dr ", " ÏÔÊ¾Ä¿Â¼", "dr");
+		HelpOutput("cp ", " ¿½±´ÎÄ¼ş", "cp <name_old> <name_new>");
+		HelpOutput("dl ", " É¾³ıÎÄ¼ş", "dl <name>");
+		HelpOutput("tree ", " ÏÔÊ¾Ä¿Â¼Ê÷", "tp <name>");
+		HelpOutput("move ", " ÒÆ¶¯ÎÄ¼ş", "more <name1> <name2>");
+		HelpOutput("att ", " ÏÔÊ¾ÎÄ¼şÊôĞÔ", "att <name>");
+		HelpOutput("help ", " °ïÖúĞÅÏ¢", "help [ÃüÁîÃû(¿ÉÑ¡)]");
+        HelpOutput("end", " ÍË³ö³ÌĞò", "end");
+        HelpOutput("mkdir", " ĞÂ½¨ÎÄ¼ş¼Ğ", "mkdir <dirName>");
+        HelpOutput("touch", " ĞÂ½¨ÎÄ¼ş", "touch <filename>");
+        HelpOutput("lrb", " ÏÔÊ¾»ØÊÕÕ¾", "lrb");
+        HelpOutput("crb", " Çå¿Õ»ØÊÕÕ¾", "crb");
+        HelpOutput("map", " ÏÔÊ¾ÎÄ¼şÕ¼ÓÃ¿éºÅ", "map <filename>");
 		break;
 
 	case 1:
-		HELP_DETAIL("create", "create <name> [size(å¯é€‰)]",
-					"ç”¨ create å‘½ä»¤å»ºç«‹ä¸€ä¸ªæ–°çš„ Mini-FS ç©ºé—´",
-					"create SName å»ºç«‹ä¸€ä¸ªåä¸º SName å¤§å°ä¸º 1G çš„ Windows æ–‡ä»¶ä½œä¸ºå­˜å‚¨ç©ºé—´ \n\t  create SName 2048 å»ºç«‹ä¸€ä¸ªåä¸º SName å¤§å°ä¸º 2G çš„ Windows æ–‡ä»¶ä½œä¸ºå­˜å‚¨ç©ºé—´");
+		HelpDetail("create", "create <name> [size(¿ÉÑ¡)]",
+					"ÓÃ create ÃüÁî½¨Á¢Ò»¸öĞÂµÄ Mini-FS ¿Õ¼ä",
+					"create SName ½¨Á¢Ò»¸öÃûÎª SName ´óĞ¡Îª 1G µÄ Windows ÎÄ¼ş×÷Îª´æ´¢¿Õ¼ä \n\t  create SName 2048 ½¨Á¢Ò»¸öÃûÎª SName ´óĞ¡Îª 2G µÄ Windows ÎÄ¼ş×÷Îª´æ´¢¿Õ¼ä");
 		break;
 
 	case 2:
-		HELP_DETAIL("mount", "mount <name>", "ç”¨ mount å‘½ä»¤å®‰è£…è¦æ“ä½œçš„ç©ºé—´",
-					"mount SName åœ¨ Mini-FS ä¸­å®‰è£…(æ‰“å¼€)ç©ºé—´ SNameï¼Œä¸ºåç»­æ“ä½œè¿›è¡Œå‡†å¤‡");
+		HelpDetail("mount", "mount <name>", "ÓÃ mount ÃüÁî°²×°Òª²Ù×÷µÄ¿Õ¼ä",
+					"mount SName ÔÚ Mini-FS ÖĞ°²×°(´ò¿ª)¿Õ¼ä SName£¬ÎªºóĞø²Ù×÷½øĞĞ×¼±¸");
 		break;
 
 	case 3:
-		HELP_DETAIL("fmt", "fmt [size(å¯é€‰)]", "ç”¨ fmt å‘½ä»¤æ ¼å¼åŒ–å½“å‰çš„ç©ºé—´",
-					"fmt åˆå§‹åŒ–å½“å‰æ‰“å¼€çš„ SName ç©ºé—´ï¼Œç°‡å¤§å°è®¾ç½®ä¸º 4KB \n\t  fmt 8 åˆå§‹åŒ–å½“å‰æ‰“å¼€çš„ SName ç©ºé—´ï¼Œç°‡å¤§å°è®¾ç½®ä¸º 8KB");
+		HelpDetail("fmt", "fmt [size(¿ÉÑ¡)]", "ÓÃ fmt ÃüÁî¸ñÊ½»¯µ±Ç°µÄ¿Õ¼ä",
+					"fmt ³õÊ¼»¯µ±Ç°´ò¿ªµÄ SName ¿Õ¼ä£¬´Ø´óĞ¡ÉèÖÃÎª 4KB \n\t  fmt 8 ³õÊ¼»¯µ±Ç°´ò¿ªµÄ SName ¿Õ¼ä£¬´Ø´óĞ¡ÉèÖÃÎª 8KB");
 		break;
 
 	case 4:
-		HELP_DETAIL("close", "close", "ç”¨ close å‘½ä»¤é€€å‡º Mini-FS", "close é€€å‡ºå¹¶å…³é—­ Mini-FS ç³»ç»Ÿ");
+		HelpDetail("close", "close", "ÓÃ close ÃüÁîÍË³ö Mini-FS", "close ÍË³ö²¢¹Ø±Õ Mini-FS ÏµÍ³");
 		break;
 
 	case 5:
-		HELP_DETAIL("dr", "dr", "dr æ˜¾ç¤ºå½“å‰ç›®å½•ä¸‹çš„æ–‡ä»¶ç›®å½•", "");
+		HelpDetail("dr", "dr", "dr ÏÔÊ¾µ±Ç°Ä¿Â¼ÏÂµÄÎÄ¼şÄ¿Â¼", "");
 		break;
 
 	case 6:
-		HELP_DETAIL("cp", "cp <name1> <name2>", "ç”¨ cp å‘½ä»¤æ‹·è´æ–‡ä»¶",
-					"cp wFName sFName å°†æ–‡ä»¶ä» Windows ç©ºé—´ä¸­æ‹·è´è‡³ Mini-FS ç©ºé—´ä¸­ \n\t  cp sFName wFName å°†æ–‡ä»¶ä» Mini-FS ç©ºé—´ä¸­æ‹·è´è‡³ Windows ç©ºé—´ä¸­ \n\t  cp sFName1 sFName2 å°†æ–‡ä»¶ä» Mini-FS ç©ºé—´ä¸­æ‹·è´è‡³ Mini-FS ç©ºé—´ä¸­");
+		HelpDetail("cp", "cp <name1> <name2>", "ÓÃ cp ÃüÁî¿½±´ÎÄ¼ş",
+					"cp wFName sFName ½«ÎÄ¼ş´Ó Windows ¿Õ¼äÖĞ¿½±´ÖÁ Mini-FS ¿Õ¼äÖĞ \n\t  cp sFName wFName ½«ÎÄ¼ş´Ó Mini-FS ¿Õ¼äÖĞ¿½±´ÖÁ Windows ¿Õ¼äÖĞ \n\t  cp sFName1 sFName2 ½«ÎÄ¼ş´Ó Mini-FS ¿Õ¼äÖĞ¿½±´ÖÁ Mini-FS ¿Õ¼äÖĞ");
 		break;
 
 	case 7:
-		HELP_DETAIL("dl", "dl <name>", "ç”¨ dl å‘½ä»¤åˆ é™¤ç©ºé—´ä¸­çš„æ–‡ä»¶",
-					"dl sFName å°†æ–‡ä»¶ sFName ä»ç©ºé—´ä¸­åˆ é™¤");
+		HelpDetail("dl", "dl <name>", "ÓÃ dl ÃüÁîÉ¾³ı¿Õ¼äÖĞµÄÎÄ¼ş",
+					"dl sFName ½«ÎÄ¼ş sFName ´Ó¿Õ¼äÖĞÉ¾³ı");
 		break;
 
 	case 8:
-		HELP_DETAIL("tp", "tp <name>", "ç”¨ tp å‘½ä»¤æ˜¾ç¤ºå•ä¸ªæ–‡æœ¬æ–‡ä»¶",
-					"tp SFName æ˜¾ç¤ºåä¸º sFName çš„æ–‡æœ¬æ–‡ä»¶çš„å†…å®¹");
+		HelpDetail("tree", "tree", "ÓÃ tree ÃüÁîÏÔÊ¾Ä¿Â¼Ê÷","");
 		break;
 
 	case 9:
-		HELP_DETAIL("more", "more <name>", "ç”¨ more å‘½ä»¤åˆ†é¡µæ˜¾ç¤ºæ–‡æœ¬æ–‡ä»¶",
-					"more sFName åˆ†é¡µæ˜¾ç¤ºåä¸º sFName çš„æ–‡æœ¬æ–‡ä»¶çš„å†…å®¹");
+		HelpDetail("move", "move <name1> <name2>", "ÓÃ move ÃüÁîÒÆ¶¯ÎÄ¼ş",
+					"move name1 name2 ½« name1 ÎÄ¼şÒÆ¶¯µ½ name2");
 		break;
 
 	case 10:
-		HELP_DETAIL("att", "att <name>", "ç”¨ att å‘½ä»¤æ˜¾ç¤ºæ–‡æœ¬å±æ€§",
-					"att sFName æ˜¾ç¤ºåä¸º sFName çš„æ–‡ä»¶çš„æ–‡ä»¶å±æ€§(æ–‡ä»¶åã€æ‹“å±•åã€åˆ›å»ºæ—¶é—´ã€æ–‡ä»¶å¤§å°)");
+		HelpDetail("att", "att <name>", "ÓÃ att ÃüÁîÏÔÊ¾ÎÄ±¾ÊôĞÔ",
+					"att sFName ÏÔÊ¾ÃûÎª sFName µÄÎÄ¼şµÄÎÄ¼şÊôĞÔ(ÎÄ¼şÃû¡¢ÍØÕ¹Ãû¡¢´´½¨Ê±¼ä¡¢ÎÄ¼ş´óĞ¡)");
 		break;
 
 	case 11:
-		HELP_DETAIL("help", "help [å‘½ä»¤å(å¯é€‰)]", "ç”¨ help å‘½ä»¤è·å–å¸®åŠ©ä¿¡æ¯",
-					"help æ˜¾ç¤ºç³»ç»Ÿåç§°åŠå«ä¹‰ \n\t  help create æ˜¾ç¤º create çš„æŒ‡ä»¤æ ¼å¼ç­‰è¯¦ç»†ä¿¡æ¯");
+		HelpDetail("help", "help [ÃüÁîÃû(¿ÉÑ¡)]", "ÓÃ help ÃüÁî»ñÈ¡°ïÖúĞÅÏ¢",
+					"help ÏÔÊ¾ÏµÍ³Ãû³Æ¼°º¬Òå \n\t  help create ÏÔÊ¾ create µÄÖ¸Áî¸ñÊ½µÈÏêÏ¸ĞÅÏ¢");
 		break;
+
+    case 12:
+        HelpDetail("end", "end", "ÓÃ end ÃüÁîÍË³ö³ÌĞò", "");
+        break;
+
+    case 13:
+        HelpDetail("mkdir", "mkdir <dirName>", "ÓÃ mkdir ÃüÁîĞÂ½¨ÎÄ¼ş¼Ğ",
+            "mkdir ĞÂ½¨ÃûÎª dirName µÄÎÄ¼ş¼Ğ");
+        break;
+
+    case 14:
+        HelpDetail("touch", "touch <fileName>", "ÓÃ touch ÃüÁîĞÂ½¨ÎÄ¼ş",
+            "touch ĞÂ½¨ÃûÎª fileName µÄÎÄ¼ş");
+        break;
+
+    case 15:
+        HelpDetail("lrb", "lrb", "ÓÃ lrb ÃüÁîÏÔÊ¾»ØÊÕÕ¾ÄÚÈİ", "");
+        break;
+
+    case 16:
+        HelpDetail("crb", "crb", "ÓÃ crb ÃüÁîÇå¿Õ»ØÊÕÕ¾", "");
+        break;
+
+    case 17:
+        HelpDetail("map", "map <filename>", "ÓÃ map ÃüÁîÏÔÊ¾ÎÄ¼şÊ¹ÓÃ¿éºÅ", "");
+        break;
 	}
+	
 }

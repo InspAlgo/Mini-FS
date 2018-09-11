@@ -1,4 +1,4 @@
-ï»¿//
+//
 //	mfs_coresystem.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -8,11 +8,18 @@
 
 #include "mini_file_system.h"
 
+
 MiniFS::MiniFS()
 {
-    this->if_open = false;
+	mount_flag = false;
+	std::cout << "Mini File System [°æ±¾ 3.2.12]" << std::endl;
+	std::cout << "AlphaBeta ±£ÁôËùÓĞÈ¨Àû" << std::endl;
 }
+
 
 MiniFS::~MiniFS()
 {
+
+
+
 }

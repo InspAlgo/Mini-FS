@@ -1,4 +1,4 @@
-ï»¿//
+//
 //	mfs_algorithm.cpp
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
@@ -8,67 +8,172 @@
 
 #include "mini_file_system.h"
 
-/// ä»…é™æœ¬æ–‡ä»¶ä½¿ç”¨
-static const uint_8 set_mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+
+/// ½öÏŞ±¾ÎÄ¼şÊ¹ÓÃ
+static const uint_8 set_mask[8]   = {128,  64,  32,  16,   8,   4,   2,   1};
 static const uint_8 reset_mask[8] = {127, 191, 223, 239, 247, 251, 253, 254};
 
-/// <summary> ä½æ“ä½œ: ç½®ä½1 </summary>
-/// <param name="table"> å¾…ç½®ä½æ•°ç»„ </param>
-/// <param name="size"> æ•°ç»„æœ‰æ•ˆä½æ•°ç›® </param>
-/// <param name="bit_no"> ç½®1çš„ä½ç½® </param>
-/// <return> true:ç½®ä½æˆåŠŸ; false:ç½®ä½å¤±è´¥ </return>
+
+
+/// <summary> Î»²Ù×÷: ÖÃÎ»1 </summary>
+/// <param name="table"> ´ıÖÃÎ»Êı×é </param>
+/// <param name="size"> Êı×éÓĞĞ§Î»ÊıÄ¿ </param>
+/// <param name="bit_no"> ÖÃ1µÄÎ»ÖÃ </param>
+/// <return> true:ÖÃÎ»³É¹¦; false:ÖÃÎ»Ê§°Ü </return>
 bool MfsAlg::BitSet(uint_8 table[], uint_32 size, uint_32 bit_No)
 {
-	if (bit_No >= size)
-	{
+	if (bit_No >= size) {
 		return false;
 	}
 	table[bit_No >> 3] |= set_mask[bit_No & 7];
 	return true;
 }
 
-/// <summary> ä½æ“ä½œ: ç½®é›¶ </summary>
-/// <return> true:ç½®é›¶æˆåŠŸ; false:ç½®é›¶å¤±è´¥ </return>
+
+/// <summary> Î»²Ù×÷: ÖÃÁã </summary>
+/// <return> true:ÖÃÁã³É¹¦; false:ÖÃÁãÊ§°Ü </return>
 bool MfsAlg::BitReset(uint_8 table[], uint_32 size, uint_32 bit_No)
 {
-	if (bit_No >= size)
-	{
+	if (bit_No >= size) {
 		return false;
 	}
 	table[bit_No >> 3] &= reset_mask[bit_No & 7];
 	return true;
 }
 
-/// <summary> ä½æ“ä½œ: æŸ¥æ‰¾0å€¼ä½å· </summary>
-/// <return> true:ç½®é›¶æˆåŠŸ; 0xffffffff:æ— ç©ºä½ç½® </return>
-uint_32 MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
+
+/// <summary> Î»²Ù×÷: ²éÕÒ0ÖµÎ»ºÅ </summary>
+/// <return> true:ÖÃÁã³É¹¦; 0xffffffff:ÎŞ¿ÕÎ»ÖÃ </return>
+uint_32	MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
 {
 	bool flag = false;
 	uint_32 bit_No = 0xffffffff;
 
-	int byte_num = (int)ceil(size * 1.0 / 8.0);
-	for (int i = 0; i < byte_num; i++)
-	{
-		if (table[i] == 255)
-		{
-			continue;
-		}
-		for (int j = 0; j < 8; j++)
-		{
-			if (table[i] & set_mask[j] == 0)
-			{
+	uint_32 byte_num = (uint_32)ceil(size / 8.0);
+	for (uint_32 i = 0; i < byte_num; i++) {
+		if (table[i] == 255) continue;
+		for (uint_32 j = 0; j < 8; j++) {
+			if ((table[i] & set_mask[j]) == 0) {
 				bit_No = i * 8 + j;
 				flag = true;
 				break;
 			}
 		}
-		if (flag)
-			break;
+		if (flag) break;
 	}
 
-	if (bit_No > size)
-	{
+	if (bit_No >= size) {
 		bit_No = 0xffffffff;
 	}
 	return bit_No;
 }
+
+
+/// <summary> ×îĞ¡±à¼­¾àÀëËã·¨ </summary>
+/// <return> ×Ö·û´®sourceÓë×Ö·û´®targetµÄ×îĞ¡±à¼­¾àÀë </return>
+int MfsAlg::LevenDistance(const std::string source, const std::string target)
+{
+	int n = source.length();
+	int m = target.length();
+	if (m == 0)
+		return n;
+	if (n == 0)
+		return m;
+
+	std::vector<std::vector<int>> matrix(n + 1);
+	for (int i = 0; i <= n; i++)
+		matrix[i].resize(m + 1);
+
+	for (int i = 1; i <= n; i++)
+		matrix[i][0] = i;
+	for (int i = 1; i <= m; i++)
+		matrix[0][i] = i;
+
+	for (int i = 1; i <= n; i++)
+	{
+		const char si = source[i - 1];
+		for (int j = 1; j <= m; j++)
+		{
+			const char dj = target[j - 1];
+			int cost;
+			if (si == dj)
+				cost = 0;
+			else
+				cost = 1;
+			const int above = matrix[i - 1][j] + 1;
+			const int left = matrix[i][j - 1] + 1;
+			const int diag = matrix[i - 1][j - 1] + cost;
+			matrix[i][j] = std::min(above, std::min(left, diag));
+		}
+	}
+	return matrix[n][m];
+}
+
+
+/// <summary> ¼ÆËãx,y,z×îĞ¡Öµ </summary>
+uint_32 MfsAlg::Min(const uint_32 x, const uint_32 y, const uint_32 z)
+{
+	uint_32 min = x;
+	if (y < min) min = y;
+	if (z < min) min = z;
+	return min;
+}
+
+
+/// <summary> ×îĞ¡±à¼­¾àÀëËã·¨ </summary>
+/// <return> ×Ö·û´®sourceÓë×Ö·û´®targetµÄ×îĞ¡±à¼­¾àÀë </return>
+//uint_32 MfsAlg::LevenDistance(const char source[], const char target[])
+//{
+//	uint_32 len_s = strlen(source);
+//	uint_32 len_t = strlen(target);
+//
+//	if (len_s == 0)		 return len_t;
+//	else if (len_t == 0) return len_s;
+//
+//	// ¿ª±Ù¶şÎ¬Êı×é martix[len_t][len_s], ²¢³õÊ¼»¯
+//	uint_32 ** matrix = (uint_32 **)calloc((len_s + 1)*(len_t + 1), sizeof(uint_32));
+//	for (uint_32 i = 1; i <= len_s; i++) {
+//		matrix[i][0] = i;
+//	}
+//	for (uint_32 j = 1; j <= len_t; j++) {
+//		matrix[0][j] = j;
+//	}
+//
+//	// ¶¯Ì¬¹æ»®¼ÆËã±à¼­¾àÀë
+//	for (uint_32 i = 1; i <= len_s; i++) {
+//		for (uint_32 j = 1; j <= len_t; j++) {
+//			int cost;
+//			if (source[i - 1] == target[j - 1])
+//				cost = 0;
+//			else
+//				cost = 1;
+//			uint_32 above = matrix[i - 1][j] + 1;
+//			uint_32 left  = matrix[i][j - 1] + 1;
+//			uint_32 diag  = matrix[i - 1][j - 1] + cost;
+//			matrix[i][j]  = Min(above, left, diag);
+//		}
+//	}
+//
+//	return matrix[len_s][len_t];
+//}
+
+
+/// <summary> ·Ö¸îÂ·¾¶ </summary>
+/// <return> ´«ÈëÍêÕûÂ·¾¶name[], ÒÀ´Î·Ö¸î³ÉpathÏòÁ¿ </return>
+void MfsAlg::cutPath(char name[], std::vector<std::string> &path) {
+	std::string cur_path = "";
+	int len = strlen(name);
+	for (int i = 0; i < len; i++) {
+		if (name[i] == '\\') {
+			path.push_back(cur_path);
+			cur_path.clear();
+		}
+		else {
+			cur_path += name[i];
+		}
+	}
+	if (cur_path.length())
+		path.push_back(cur_path);
+}
+
+

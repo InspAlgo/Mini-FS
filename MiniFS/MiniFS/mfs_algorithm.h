@@ -1,28 +1,53 @@
-ï»¿//
+//
 //	mfs_algorithm.h
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
 //	This is the algorithm library that Mini File System need.
 //
-
+#pragma once
 #ifndef __MFS_ALGORITHM_H__
 #define __MFS_ALGORITHM_H__
 
-/// å¾®å‹æ–‡ä»¶ç³»ç»Ÿç®—æ³•åº“
+
+/// Î¢ĞÍÎÄ¼şÏµÍ³Ëã·¨¿â
 namespace MfsAlg
 {
+	/// Î»²Ù×÷
+			// Î»²Ù×÷: ÖÃÎ»1
+	bool	BitSet(uint_8 table[], uint_32 size, uint_32 bit_No);
+			// Î»²Ù×÷: ÖÃÁã
+	bool	BitReset(uint_8 table[], uint_32 size, uint_32 bit_No);
+			// Î»²Ù×÷: ²éÕÒ0ÖµÎ»ºÅ
+	uint_32	BitFindRoom(uint_8 table[], uint_32 size);
 
-/// ä½æ“ä½œ
-// ä½æ“ä½œ: ç½®ä½1
-bool BitSet(uint_8 table[], uint_32 size, uint_32 bit_No);
-// ä½æ“ä½œ: ç½®é›¶
-bool BitReset(uint_8 table[], uint_32 size, uint_32 bit_No);
-// ä½æ“ä½œ: æŸ¥æ‰¾0å€¼ä½å·
-uint_32 BitFindRoom(uint_8 table[], uint_32 size);
 
-/// å­—ç¬¦ä¸²åŒ¹é…
+	/// ¼ÆËã×îĞ¡Öµ
+	uint_32	Min(const uint_32 x, const uint_32 y, const uint_32 z);
 
-} // namespace MfsAlg
+
+	/// ±à¼­¾àÀëËã·¨
+	int		LevenDistance(const std::string source, const std::string target);
+	//uint_32	LevenDistance(const char source[], const char target[]);
+
+
+	/// ·Ö¸îÂ·¾¶
+	void	cutPath(char name[], std::vector<std::string>& path);
+
+
+	/// ×Ö·û´®Æ¥Åä
+
+
+}
+
+
+
+
+
+
+
+
+
+
 
 #endif
