@@ -3,7 +3,7 @@
 //
 //		Copyright (c) AlphaBeta Team. All rights reserved.
 //
-//	This is the core data structures of Mini File System.
+//	This is the core structures of Mini File System.
 //
 #pragma once
 #ifndef __MFS_CORESYSTEM_H__
@@ -11,8 +11,10 @@
 
 
 ///	微型文件系统 (Mini File System)
-class MiniFS {
+class MiniFS
+{
 private:
+	bool					mount_flag;			// 空间打开标记 
 	MBR						mbr;				// 主引导记录 
 	FILE *					space_fp;			// 当前空间(文件)指针 
 	uint_8 *				CAB;				// 簇分配位图 
@@ -25,11 +27,12 @@ public:
 	MiniFS();
 	~MiniFS();
 
+
 //	命令解析模块			<mfs_cs_cmd.cpp>
 public:
 	int			cmd(void);
 private:
-	inline void	printFilePath(void);
+	void		printFilePath(void);
 
 
 //	帮助系统模块			<mfs_cs_help.cpp>
@@ -39,16 +42,16 @@ private:
 
 //	硬盘读写模块			<mfs_cs_diskio.cpp>
 private:
-	inline void	readMBR(void);
-	inline void	writeMBR(void) const;
-	inline void	readCAB(void);
-	inline void	writeCAB(void) const;
-	inline void	readFAT(void);
-	inline void	writeFAT(void) const;
-	inline void	readCluster(const uint_32 cluster);
-	inline void	writeCluster(const uint_32 cluster) const;
+	void		readMBR(void);
+	void		writeMBR(void) const;
+	void		readCAB(void);
+	void		writeCAB(void) const;
+	void		readFAT(void);
+	void		writeFAT(void) const;
+	void		readCluster(const uint_32 cluster);
+	void		writeCluster(const uint_32 cluster) const;
 	Directory	readDirectory(const uint_32 dir_entrance) const;
-	void		rewriteDirectory(const Directory dir) const;
+	void		rewriteDirectory(const Directory dir);
 	void		newWriteDirectory(const Directory dir) const;
 
 
@@ -60,17 +63,26 @@ private:
 	int			closeSpace(void);
 
 
-//	文件操作模块			<mfs_cs_fileop.cpp>
+	//	文件操作模块			<mfs_cs_fileop.cpp>
 private:
 	int			showDirectory(void);
-	int			copyFile(char filename_1[], char filename_2[], int mode);
-	int			deleteFile(char filename[]);
-	int			displayFile(char filename[]);
-	int			moreDisplayFile(char filename[]);
-	int			showAttribute(char filename[]);
+	void		treeDirectory(void);
+	int	    	occupyCluster(char filename[]);
+	int			changeDirectory(char filename[]);
 	int			makeDir(char filename[]);
 	int			createFile(char filename[]);
+	int			copyFile(char filename_1[], char filename_2[]);
+	int			showAttribute(const char filename[]);
+	int			deleteFile(char filename[]);
+	void		showRecycleBin(void);
+
+	// 有关递归操作函数 
+	void		treeRecur(uint_32 dir_entrance, std::vector<int>& path);
+	void		delRecur(uint_32 dir_entrance);
+	void		showRBRecur(uint_32 dir_entrance, std::vector<std::string>& path);
+
 };
+
 
 
 
