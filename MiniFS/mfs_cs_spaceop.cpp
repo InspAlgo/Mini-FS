@@ -5,24 +5,54 @@
 //
 //	Class MiniFS: This file implements rewriting control information of space.
 //
-
+#pragma warning (disable:4996)
 #include "mini_file_system.h"
 
 
+
 /// <summary> 创建空间 </summary>
-/// <return> -1:空间名重复; 1:创建成功 </return>
+/// <return> -1:空间路径错误; -2:空间名长度超限; -3:空间名重复; 1:创建成功 </return>
 int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 {
+	std::vector<std::string> path;
+	std::string spacedir = "";
+
+	MfsAlg::cutPath(name, path);
+	for (int i = 0; i < (int)path.size() - 1; i++)
+		spacedir += path[i] + "\\";
+
+	// 检测路径是否正确
+	if (spacedir != ""){
+		struct stat buf;
+		const char* dirname = spacedir.data();
+		int result = stat(dirname, &buf);
+		if ((_S_IFDIR & buf.st_mode) != _S_IFDIR)
+			return -1;
+	}
+
+	// 检测空间名的路径，空间名长度
+	const char* spacename = path[path.size() - 1].data();
+	if (strlen(spacename) > 24)
+		return -2;
+
 	// 判断此位置是否有同名文件
 	FILE * fp = fopen(name, "r");
 	if (fp != NULL) {
 		fclose(fp);
-		return -1;
+		return -3;
 	}
-
+	
 	// 创建空间
 	space_fp = fopen(name, "wb+");
-	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_SET);
+	//fseek(space_fp, 0L, SEEK_SET);
+	//uint_64 size_B = (uint_64)space_size * 1024 * 1024 - 1;
+	/*
+	while (size_B > 2e30) {
+	fseek(space_fp, 2e30L, SEEK_CUR);
+	size_B -= 2e30;
+	}
+	*/
+	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_CUR);
 	fwrite("\0", 1, 1, space_fp);
 	fclose(space_fp);
 
@@ -30,13 +60,13 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	space_fp = fopen(name, "rb+");
 
 	// 写入mbr
-	strcpy(mbr.space_name, name);
+	strcpy(mbr.space_name, spacename);
 	mbr.space_size = space_size;
 	mbr.cluster_size = cluster_size;
 	mbr.cluster_num = space_size * 1024 / cluster_size;
 	mbr.CAB_entrance = 1;
-	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0*mbr.cluster_size));
-	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
+	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0 * mbr.cluster_size));
+	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0 * mbr.cluster_size));
 	mbr.create_time = time(NULL);
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
 	// MBR写回硬盘
@@ -67,18 +97,18 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	free(FAT);
 
 	// 新建根目录文件并写入硬盘
-	Directory creat_directory;
-	strcpy(creat_directory.header.name, mbr.space_name);
-	creat_directory.header.occupy_cluster_num = 1;
-	creat_directory.header.current_dir_entrance = mbr.RDF_entrance;
-	creat_directory.header.parent_dir_entrance = mbr.RDF_entrance;
-	creat_directory.header.file_num = 0;
-	creat_directory.header.create_time = mbr.create_time;
-	creat_directory.header.modify_time = mbr.create_time;
-	creat_directory.header.folder_size = sizeof(DFH);
-	creat_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
-	rewriteDirectory(creat_directory);
-	free(creat_directory.fcb);
+	Directory create_directory;
+	strcpy(create_directory.header.name, mbr.space_name);
+	create_directory.header.occupy_cluster_num = 1;
+	create_directory.header.current_dir_entrance = mbr.RDF_entrance;
+	create_directory.header.parent_dir_entrance = mbr.RDF_entrance;
+	create_directory.header.file_num = 0;
+	create_directory.header.create_time = mbr.create_time;
+	create_directory.header.modify_time = mbr.create_time;
+	create_directory.header.folder_size = 0;
+	create_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
+	newWriteDirectory(create_directory);
+	free(create_directory.fcb);
 
 	fclose(space_fp);
 	space_fp = NULL;
@@ -89,18 +119,26 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 /// <return> -1:打开失败; 1:打开成功 </return>
 int MiniFS::mountSpace(char name[])
 {
-	space_fp = fopen(name, "r");
-	if (space_fp == NULL) return -1;
-	fclose(space_fp);
+	FILE * fp = fopen(name, "r");
+	if (fp == NULL) {
+		return -1;
+	}
+	fclose(fp);
+
 	space_fp = fopen(name, "rb+");
+	mount_flag = true;
 
 	readMBR();
+	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	readCAB();
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
 	readFAT();
 	Directory current_directory = readDirectory(mbr.RDF_entrance);
 	directory.push_back(current_directory);
+
+	// 改写文件缓冲区大小
+	buffer = calloc(mbr.cluster_size, 1024);
 
 	return 1;
 }
@@ -111,12 +149,12 @@ int MiniFS::mountSpace(char name[])
 int MiniFS::formatSpace(uint_32 cluster_size)
 {
 	// 改写MBR
+	/*	CAB文件占用簇数 为 【 簇数 / 单簇大小(KB) / 8192 】
+		FAT文件占用簇数 为 【 簇数 / 单簇大小(KB) / 256 】	 */
 	mbr.cluster_size = cluster_size;
 	mbr.cluster_num = mbr.space_size * 1024 / mbr.cluster_size;
 	mbr.CAB_entrance = 1;
-	// CAB文件占用簇数 为 【 簇数 / 单簇大小(KB) / 8192 】
 	mbr.FAT_entrance = mbr.CAB_entrance + (uint_32)ceil(mbr.cluster_num / (8192.0*mbr.cluster_size));
-	// FAT文件占用簇数 为 【 簇数 / 单簇大小(KB) / 256 】
 	mbr.RDF_entrance = mbr.FAT_entrance + (uint_32)ceil(mbr.cluster_num / (256.0*mbr.cluster_size));
 	mbr.free_cluster_num = mbr.cluster_num - mbr.RDF_entrance - 1;
 
@@ -125,7 +163,6 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 
 	// 重新开辟CAB内存空间并写回
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
-
 	free(CAB);
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
 	writeCAB();
@@ -147,7 +184,7 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	format_directory.header.modify_time = time(NULL);
 	format_directory.header.folder_size = sizeof(DFH);
 	format_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
-	rewriteDirectory(format_directory);
+	newWriteDirectory(format_directory);
 	directory.push_back(format_directory);
 	free(format_directory.fcb);
 
@@ -157,19 +194,30 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	return 1;
 }
 
+
+/// <summary> 关闭当前空间 </summary>
+/// <return> -1:关闭失败,当前未打开任何空间; 1:关闭当前空间成功 </return>
 int MiniFS::closeSpace(void)
 {
-	writeMBR();
+	if (!mount_flag) return -1;
 
+	writeMBR();
 	writeCAB();
 	free(CAB);
-
 	writeFAT();
 	free(FAT);
-
 	free(buffer);
-	directory.clear();
-	fclose(space_fp);
 
+	std::vector<Directory>::iterator iter;
+	Directory cur_dir;
+	for (iter = directory.begin(); iter != directory.end(); iter++) {
+		cur_dir = (*iter);
+		free(cur_dir.fcb);
+	}
+	directory.clear();
+
+	fclose(space_fp);
+	space_fp = NULL;
+	mount_flag = false;
 	return 1;
 }
