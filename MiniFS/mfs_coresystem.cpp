@@ -8,6 +8,7 @@
 
 #include "mini_file_system.h"
 
+
 MiniFS::MiniFS()
 {
 	mount_flag = false;
@@ -15,6 +16,10 @@ MiniFS::MiniFS()
 	std::cout << "(c) 2018 AlphaBeta。保留所有权利。" << std::endl;
 }
 
+
 MiniFS::~MiniFS()
 {
+
+
+
 }

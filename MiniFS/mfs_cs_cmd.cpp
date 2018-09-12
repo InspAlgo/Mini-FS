@@ -8,8 +8,8 @@
 
 #include "mini_file_system.h"
 
-std::string command_array[] = { "create", "mount", "fmt", "dr", "cp", "dl", "att", "help", "close", "end", "mkdir" ,"tree", "move", "lrb", "crb" };
-int command_distance[15];
+std::string command_array[] = { "create", "mount", "fmt", "dr", "cp", "dl", "att", "help", "close", "end", "mkdir", "tree", "move", "lrb", "crb" , "map", "cd", "touch", "opt"};
+int command_distance[19];
 
 void MiniFS::printFilePath(void)
 {
@@ -40,9 +40,9 @@ int MiniFS::cmd(void)
 	{
 		if (command_input[i] == ' ')
 		{
-			if (space_flag)
-				input_temp += command_input[i];
-			space_flag = false;
+            if (space_flag)
+                input_temp += command_input[i];
+            space_flag = false;
 		}
 		else
 		{
@@ -76,10 +76,10 @@ int MiniFS::cmd(void)
 	{
 		if (command_num == 2)
 		{
-			if (this->createSpace((char *)command_vector[1].data(), 1024, 4) == 1)
-				std::cout << "空间创建成功!" << std::endl;
-			else
-				std::cout << "空间已存在!" << std::endl;
+            if (this->createSpace((char *)command_vector[1].data(), 1024, 4) == 1)
+                std::cout << "空间创建成功!" << std::endl;
+            else
+                std::cout << "空间已存在!" << std::endl;
 		}
 		else if (command_num == 3)
 		{
@@ -144,56 +144,63 @@ int MiniFS::cmd(void)
 	// example: mount space_name; space_name 可以包含路径 ok
 	else if (command == "mount")
 	{
-		if (command_num == 2)
-		{
-			std::ifstream ifs(command_vector[1].c_str());
-			if (ifs)
-			{
-				if (this->mountSpace((char *)command_vector[1].data()) != 1)
-					std::cout << command_vector[1] << " 打开失败!" << std::endl;
-				else
-					this->mount_flag = true;
-			}
-			else
-				std::cout << command_vector[1] << " 不存在此路径!" << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (command_num == 2)
+        {
+            if (this->mount_flag)
+            {
+                std::cout << "当前已经打开一个空间!" << std::endl;
+                return 1;
+            }
+
+            std::ifstream ifs(command_vector[1].c_str());
+            if (ifs)
+            {
+                if (this->mountSpace((char *)command_vector[1].data()) != 1)
+                    std::cout << command_vector[1] << " 打开失败!" << std::endl;
+                else
+                    this->mount_flag = true;
+            }
+            else
+                std::cout << command_vector[1] << " 不存在此路径!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
 	// example: dr; 显示当前文件夹下的文件目录  ok
 	else if (command == "dr")
 	{
-		if (command_num == 1) {
-			if (!this->mount_flag)
-			{
-				std::cout << "当前没有打开空间!" << std::endl;
-				return 1;
-			}
-			this->showDirectory();
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (command_num == 1)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+            this->showDirectory();
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
 	// example: cp filename_old filename_new;  ok
 	// 有从外部系统->Mini-FS、Mini-FS->外部系统、Mini-FS->Mini-FS三种情况
 	else if (command == "cp")
 	{
-		if (!this->mount_flag)
-		{
-			std::cout << "当前没有打开空间!" << std::endl;
-			return 1;
-		}
-		if (command_num == 3)
-		{
-			if (this->copyFile((char *)command_vector[1].data(), (char *)command_vector[2].data()) != 1)
-				std::cout << "拷贝文件失败!" << std::endl;
-			else
-				std::cout << "成功拷贝文件!" << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (!this->mount_flag)
+        {
+            std::cout << "当前没有打开空间!" << std::endl;
+            return 1;
+        }
+        if (command_num == 3)
+        {
+            if (this->copyFile((char *)command_vector[1].data(), (char *)command_vector[2].data()) != 1)
+                std::cout << "拷贝文件失败!" << std::endl;
+            else
+                std::cout << "成功拷贝文件!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
 	// example: dl filename; 删除空间中的文件  ok
@@ -220,16 +227,16 @@ int MiniFS::cmd(void)
 	{
 		if (!this->mount_flag)
 		{
-			std::cout << "当前没有打开空间!" << std::endl;
-			return 1;
+            std::cout << "当前没有打开空间!" << std::endl;
+            return 1;
 		}
-		if (command_num == 2)
-		{
-			if (this->showAttribute((char *)command_vector[1].data()) != 1)
-				std::cout << "查找文件失败!" << std::endl;
-		}
-		else
-			std::cout << command << " 参数错误!" << std::endl;
+        if (command_num == 2)
+        {
+            if (this->showAttribute((char *)command_vector[1].data()) != 1)
+                std::cout << "查找文件失败!" << std::endl;
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
 	}
 
 	// example: help [命令名(可选)];   ok
@@ -412,46 +419,105 @@ int MiniFS::cmd(void)
     else if (command == "tree")
     {
         if (command_num == 1)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
             this->treeDirectory();
+        }
         else
             std::cout << command << " 参数错误!" << std::endl;
     }
 
-    // example: lrb; 显示回收站
+    // example: lrb; 显示回收站  ok
     else if (command == "lrb")
     {
         if (command_num == 1)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
             this->showRecycleBin();
+        }
         else
             std::cout << command << " 参数错误!" << std::endl;
     }
     
-    // example: crb; 清空回收站
-	/*
+    // example: crb; 清空回收站  ok
     else if (command == "crb")
     {
         if (command_num == 1)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
             this->emptyRecycleBin();
+        }
         else
             std::cout << command << " 参数错误!" << std::endl;
-    }*/
+    }
 
-    // example: map; 查看文件使用块号
+    // example: map; 查看文件使用块号  ok
     else if (command == "map")
     {
         if (command_num == 2)
         {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+
             if (this->occupyCluster((char *)command_vector[1].data()) != 1)
                 std::cout << "查找文件失败!" << std::endl;
         }
         else
             std::cout << command << " 参数错误!" << std::endl;
     }
+
+    // example: opt; 优化空间
+    else if (command == "opt")
+    {
+        if (command_num == 1)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
+    // example: move; 移动文件(夹)
+    else if (command == "move")
+    {
+        if (command_num == 3)
+        {
+            if (!this->mount_flag)
+            {
+                std::cout << "当前没有打开空间!" << std::endl;
+                return 1;
+            }
+
+        }
+        else
+            std::cout << command << " 参数错误!" << std::endl;
+    }
+
 	else
 	{
 		std::cout << command << " 不是一个正确的命令!" << std::endl;
 		bool if_dis = false;
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < 19; i++)
 		{
 			command_distance[i] = MfsAlg::LevenDistance(command, command_array[i]);
 			if (command_distance[i] < 3)
@@ -463,7 +529,7 @@ int MiniFS::cmd(void)
 		bool dis_flag = false;
 		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < 15; j++)
+			for (int j = 0; j < 19; j++)
 			{
 				if (command_distance[j] == i)
 				{

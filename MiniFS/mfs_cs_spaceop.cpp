@@ -41,7 +41,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 		fclose(fp);
 		return -3;
 	}
-	
+
 	// 创建空间
 	space_fp = fopen(name, "wb+");
 	//fseek(space_fp, 0L, SEEK_SET);
@@ -138,7 +138,7 @@ int MiniFS::mountSpace(char name[])
 	directory.push_back(current_directory);
 
 	// 改写文件缓冲区大小
-	buffer = calloc(mbr.cluster_size, 1024);
+	buffer = (char *)calloc(mbr.cluster_size, 1024);
 
 	return 1;
 }
@@ -189,7 +189,7 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	free(format_directory.fcb);
 
 	// 改写文件缓冲区大小
-	buffer = realloc(buffer, mbr.cluster_size * 1024);
+	buffer = (char *)realloc(buffer, mbr.cluster_size * 1024);
 
 	return 1;
 }

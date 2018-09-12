@@ -1,8 +1,9 @@
 /**
+ *	main.cpp
  *
- *	Mini File System Project
+ *		Copyright (c) 2018 AlphaBeta Team. All rights reserved.
  *
- *		Copyright (c) 2018 AlphaBeta Team. All rights reserved. 
+ *	This is application of Mini File System.
  *
  *
  *	Mini File System Project:
@@ -17,10 +18,11 @@
 
 #include "mini_file_system.h"
 
+
 int main(int argc, char *argv[])
 {
 	MiniFS simulated_disk;
-	while (simulated_disk.cmd())
-		;
+	while (simulated_disk.cmd());
 	return 0;
 }
+

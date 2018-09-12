@@ -38,6 +38,7 @@
 #include <string>
 #include <regex>
 #include <sys/stat.h>
+#include <io.h>
 
 
 #include "mfs_define.h"

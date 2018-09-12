@@ -10,6 +10,19 @@
 
 
 
+/// <summary> 将文件指针指向指定簇号 </summary>
+inline void MiniFS::seekCluster(uint_32 cluster_num)
+{
+	uint_64 size_B = (uint_64)cluster_num * mbr.cluster_size * 1024;
+	fseek(space_fp, 0L, SEEK_SET);
+	while (size_B > 1<<30) {
+		fseek(space_fp, (long)1<<30, SEEK_CUR);
+		size_B -= (uint_64)1<<30;
+	}
+	fseek(space_fp, (long)size_B, SEEK_CUR);
+}
+
+
 /// <summary> 将硬盘中的MBR信息读入内存mbr中 </summary>
 void MiniFS::readMBR(void)
 {
@@ -29,15 +42,15 @@ void MiniFS::writeMBR(void) const
 /// <summary> 将硬盘中的CAB信息读入内存CAB中 </summary>
 void MiniFS::readCAB(void)
 {
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(mbr.CAB_entrance);
 	fread(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
 }
 
 
 /// <summary> 将内存中的CAB信息写回硬盘 </summary>
-void MiniFS::writeCAB(void) const
+void MiniFS::writeCAB(void)
 {
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(mbr.CAB_entrance);
 	fwrite(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
 }
 
@@ -45,15 +58,15 @@ void MiniFS::writeCAB(void) const
 /// <summary> 将硬盘中的FAT信息读入内存FAT中 </summary>
 void MiniFS::readFAT(void)
 {
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(mbr.FAT_entrance);
 	fread(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
 }
 
 
 /// <summary> 将内存中的FAT信息写回硬盘 </summary>
-void MiniFS::writeFAT(void) const
+void MiniFS::writeFAT(void)
 {
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(mbr.FAT_entrance);
 	fwrite(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
 }
 
@@ -62,15 +75,15 @@ void MiniFS::writeFAT(void) const
 /// <param name="cluster"> 指定簇号 </param>
 void MiniFS::readCluster(const uint_32 cluster)
 {
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(cluster);
 	fread(buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 
 
 /// <summary> 将buffer中的内容写回硬盘指定簇号 </summary>
-void MiniFS::writeCluster(const uint_32 cluster) const
+void MiniFS::writeCluster(const uint_32 cluster)
 {
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
+	seekCluster(cluster);
 	fwrite(buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 
@@ -93,7 +106,7 @@ Directory MiniFS::readDirectory(uint_32 dir_entrance) const
 	cur_dir.header = dir_buffer.firstclu.header;
 	cur_dir.fcb = (FCB *)malloc(cur_dir.header.file_num * sizeof(FCB));
 
-	remain_file  = cur_dir.header.file_num;
+	remain_file = cur_dir.header.file_num;
 	remain_block = block_num - 1;
 
 	uint_32 idx_m = 0;
