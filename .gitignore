@@ -13,6 +13,9 @@ MiniFS/MiniFS/x64/*
 .gitignore_LOCAL_912
 .gitignore_REMOTE_912
 MiniFS/UnitTest_MiniFS/*
+MiniFS/MiniFS.sln
+MiniFS/MiniFS/*
+
 # Prerequisites
 *.d
 
