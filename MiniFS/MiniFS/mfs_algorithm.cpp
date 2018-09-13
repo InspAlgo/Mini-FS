@@ -164,7 +164,7 @@ void MfsAlg::cutPath(char name[], std::vector<std::string> &path) {
 	std::string cur_path = "";
 	int len = strlen(name);
 	for (int i = 0; i < len; i++) {
-		if (name[i] == '\\') {
+		if (name[i] == '\\' || name[i] == '/') {
 			path.push_back(cur_path);
 			cur_path.clear();
 		}

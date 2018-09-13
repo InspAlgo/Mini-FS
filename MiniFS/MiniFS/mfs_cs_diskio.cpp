@@ -9,11 +9,10 @@
 #include "mini_file_system.h"
 
 
-
 /// <summary> 将硬盘中的MBR信息读入内存mbr中 </summary>
 void MiniFS::readMBR(void)
 {
-	fseek(space_fp, 0L, SEEK_SET);
+	_fseeki64(space_fp, 0LL, SEEK_SET);
 	fread(&mbr, sizeof(MBR), 1, space_fp);
 }
 
@@ -21,7 +20,7 @@ void MiniFS::readMBR(void)
 /// <summary> 将内存中的mbr信息写回硬盘 </summary>
 void MiniFS::writeMBR(void) const
 {
-	fseek(space_fp, 0L, SEEK_SET);
+	_fseeki64(space_fp, 0LL, SEEK_SET);
 	fwrite(&mbr, sizeof(MBR), 1, space_fp);
 }
 
@@ -29,15 +28,15 @@ void MiniFS::writeMBR(void) const
 /// <summary> 将硬盘中的CAB信息读入内存CAB中 </summary>
 void MiniFS::readCAB(void)
 {
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, mbr.CAB_entrance*mbr.cluster_size * 1024, SEEK_SET);
 	fread(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
 }
 
 
 /// <summary> 将内存中的CAB信息写回硬盘 </summary>
-void MiniFS::writeCAB(void) const
+void MiniFS::writeCAB(void)
 {
-	fseek(space_fp, mbr.CAB_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, mbr.CAB_entrance*mbr.cluster_size * 1024, SEEK_SET);
 	fwrite(CAB, sizeof(uint_8), CAB_occupu_byte, space_fp);
 }
 
@@ -45,15 +44,15 @@ void MiniFS::writeCAB(void) const
 /// <summary> 将硬盘中的FAT信息读入内存FAT中 </summary>
 void MiniFS::readFAT(void)
 {
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, mbr.FAT_entrance*mbr.cluster_size * 1024, SEEK_SET);
 	fread(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
 }
 
 
 /// <summary> 将内存中的FAT信息写回硬盘 </summary>
-void MiniFS::writeFAT(void) const
+void MiniFS::writeFAT(void)
 {
-	fseek(space_fp, mbr.FAT_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, mbr.FAT_entrance*mbr.cluster_size * 1024, SEEK_SET);
 	fwrite(FAT, sizeof(uint_32), mbr.cluster_num, space_fp);
 }
 
@@ -62,15 +61,15 @@ void MiniFS::writeFAT(void) const
 /// <param name="cluster"> 指定簇号 </param>
 void MiniFS::readCluster(const uint_32 cluster)
 {
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, cluster*mbr.cluster_size * 1024, SEEK_SET);
 	fread(buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 
 
 /// <summary> 将buffer中的内容写回硬盘指定簇号 </summary>
-void MiniFS::writeCluster(const uint_32 cluster) const
+void MiniFS::writeCluster(const uint_32 cluster)
 {
-	fseek(space_fp, cluster * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, cluster*mbr.cluster_size * 1024, SEEK_SET);
 	fwrite(buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 
@@ -87,13 +86,13 @@ Directory MiniFS::readDirectory(uint_32 dir_entrance) const
 	uint_32		remain_file;						// 当前文件夹未读取FCB文件数
 	uint_32		remain_block;						// 当前簇未读块数
 
-	fseek(space_fp, dir_entrance * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, dir_entrance * mbr.cluster_size * 1024, SEEK_SET);
 	fread(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 
 	cur_dir.header = dir_buffer.firstclu.header;
 	cur_dir.fcb = (FCB *)malloc(cur_dir.header.file_num * sizeof(FCB));
 
-	remain_file  = cur_dir.header.file_num;
+	remain_file = cur_dir.header.file_num;
 	remain_block = block_num - 1;
 
 	uint_32 idx_m = 0;
@@ -109,7 +108,7 @@ Directory MiniFS::readDirectory(uint_32 dir_entrance) const
 	while (remain_file > 0) {
 		if (remain_block == 0) {
 			cur_cluster = FAT[cur_cluster];
-			fseek(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
+			_fseeki64(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
 			fread(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 			remain_block = block_num;
 			idx_d = 0;
@@ -161,7 +160,7 @@ void MiniFS::rewriteDirectory(const Directory dir)
 		idx_m++;
 		idx_d++;
 	}
-	fseek(space_fp, cur_cluster*mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, cur_cluster*mbr.cluster_size * 1024, SEEK_SET);
 	fwrite(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 	mbr.free_cluster_num -= 1;
 
@@ -178,7 +177,7 @@ void MiniFS::rewriteDirectory(const Directory dir)
 			cur_cluster = MfsAlg::BitFindRoom(CAB, mbr.cluster_num);
 			MfsAlg::BitSet(CAB, mbr.cluster_num, cur_cluster);
 			FAT[last_curster] = cur_cluster;
-			fseek(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
+			_fseeki64(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
 			fwrite(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 			mbr.free_cluster_num -= 1;
 			remain_block = block_num;
@@ -190,7 +189,7 @@ void MiniFS::rewriteDirectory(const Directory dir)
 		cur_cluster = MfsAlg::BitFindRoom(CAB, mbr.cluster_num);
 		MfsAlg::BitSet(CAB, mbr.cluster_num, cur_cluster);
 		FAT[last_curster] = cur_cluster;
-		fseek(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
+		_fseeki64(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
 		fwrite(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 		mbr.free_cluster_num -= 1;
 	}
@@ -208,7 +207,7 @@ void MiniFS::newWriteDirectory(const Directory dir) const
 	DFC			dir_buffer;							            // 目录文件缓冲区
 
 	dir_buffer.firstclu.header = dir.header;
-	fseek(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
+	_fseeki64(space_fp, cur_cluster * mbr.cluster_size * 1024, SEEK_SET);
 	fwrite(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 

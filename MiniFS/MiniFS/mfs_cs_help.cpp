@@ -57,6 +57,8 @@ void MiniFS::showHelp(int mode)
         HelpOutput("lrb", " 显示回收站", "lrb");
         HelpOutput("crb", " 清空回收站", "crb");
         HelpOutput("map", " 显示文件占用块号", "map <filename>");
+        HelpOutput("cd", " 位置转移", "cd dirName");
+        HelpOutput("opt", " 优化空间", "opt");
 		break;
 
 	case 1:
@@ -137,6 +139,10 @@ void MiniFS::showHelp(int mode)
     case 17:
         HelpDetail("map", "map <filename>", "用 map 命令显示文件使用块号", "");
         break;
+    case 18:
+        HelpDetail("cd", "cd dirName", "用 cd 命令进行位置转移", "cd dirName 移动到 dirName 目录下");
+    case 19:
+        HelpDetail("opt", "opt", "用 opt 命令优化当前空间，将文件尽可能连续存放", "opt 优化当前空间");
 	}
 	
 }

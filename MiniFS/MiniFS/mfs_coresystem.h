@@ -21,41 +21,41 @@ private:
 	uint_32					CAB_occupu_byte;	// CAB占用字节数 
 	uint_32 *				FAT;				// 文件分配表 
 	std::vector<Directory>	directory;			// 文件目录 
-	void *					buffer;				// 空间输入输出缓冲区 
+	char *					buffer;				// 空间输入输出缓冲区 
 
 public:
 	MiniFS();
 	~MiniFS();
 
 
-//	命令解析模块			<mfs_cs_cmd.cpp>
+	//	命令解析模块			<mfs_cs_cmd.cpp>
 public:
 	int			cmd(void);
 private:
 	void		printFilePath(void);
 
 
-//	帮助系统模块			<mfs_cs_help.cpp>
+	//	帮助系统模块			<mfs_cs_help.cpp>
 private:
 	void		showHelp(int mode = 0);
 
 
-//	硬盘读写模块			<mfs_cs_diskio.cpp>
+	//	硬盘读写模块			<mfs_cs_diskio.cpp>
 private:
 	void		readMBR(void);
 	void		writeMBR(void) const;
 	void		readCAB(void);
-	void		writeCAB(void) const;
+	void		writeCAB(void);
 	void		readFAT(void);
-	void		writeFAT(void) const;
+	void		writeFAT(void);
 	void		readCluster(const uint_32 cluster);
-	void		writeCluster(const uint_32 cluster) const;
+	void		writeCluster(const uint_32 cluster);
 	Directory	readDirectory(const uint_32 dir_entrance) const;
 	void		rewriteDirectory(const Directory dir);
 	void		newWriteDirectory(const Directory dir) const;
 
 
-//	空间操作模块			<mfs_cs_spaceop.cpp>
+	//	空间操作模块			<mfs_cs_spaceop.cpp>
 private:
 	int			createSpace(char name[], uint_32 space_size = 1024, uint_32 cluster_size = 4);
 	int			mountSpace(char name[]);
@@ -72,14 +72,17 @@ private:
 	int			makeDir(char filename[]);
 	int			createFile(char filename[]);
 	int			copyFile(char filename_1[], char filename_2[]);
+	int         moveFile(char filename_1[], char filename_2[]);
 	int			showAttribute(const char filename[]);
 	int			deleteFile(char filename[]);
 	void		showRecycleBin(void);
+	void		emptyRecycleBin(void);
 
 	// 有关递归操作函数 
 	void		treeRecur(uint_32 dir_entrance, std::vector<int>& path);
 	void		delRecur(uint_32 dir_entrance);
-	void		showRBRecur(uint_32 dir_entrance, std::vector<std::string>& path);
+	void		showRBRecur(uint_32 dir_entrance, std::vector<std::string>& path, bool &empty, int mode = 0);
+	void		emptyRBRecur(uint_32 dir_entrance);
 
 };
 
