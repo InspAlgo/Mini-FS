@@ -44,15 +44,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 
 	// 创建空间
 	space_fp = fopen(name, "wb+");
-	//fseek(space_fp, 0L, SEEK_SET);
-	//uint_64 size_B = (uint_64)space_size * 1024 * 1024 - 1;
-	/*
-	while (size_B > 2e30) {
-	fseek(space_fp, 2e30L, SEEK_CUR);
-	size_B -= 2e30;
-	}
-	*/
-	fseek(space_fp, space_size * 1024 * 1024 - 1, SEEK_CUR);
+	_fseeki64(space_fp, space_size * 1024 * 1024 - 1, SEEK_SET);
 	fwrite("\0", 1, 1, space_fp);
 	fclose(space_fp);
 
@@ -115,6 +107,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	return 1;
 }
 
+
 /// <summary> 打开空间 </summary>
 /// <return> -1:打开失败; 1:打开成功 </return>
 int MiniFS::mountSpace(char name[])
@@ -143,6 +136,7 @@ int MiniFS::mountSpace(char name[])
 	return 1;
 }
 
+
 /// <summary> 格式化空间 </summary>
 /// <param name="cluster_size"> 文件系统单簇大小 </param>
 /// <return> 1:格式化成功; -1:格式化失败 </return>
@@ -165,14 +159,24 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	CAB_occupu_byte = (uint_32)(ceil(mbr.cluster_num / 8.0));
 	free(CAB);
 	CAB = (uint_8 *)calloc(CAB_occupu_byte, sizeof(uint_8));
+	for (uint_32 i = 0; i <= mbr.RDF_entrance; i++) {
+		MfsAlg::BitSet(CAB, mbr.cluster_num, i);
+	}
 	writeCAB();
 
 	// 重新开辟FAT内存空间
 	free(FAT);
 	FAT = (uint_32 *)calloc(mbr.cluster_num, sizeof(uint_32));
+	FAT[mbr.RDF_entrance] = ECOF;
 	writeFAT();
 
 	// 清空文件目录并将根目录文件写回
+	std::vector<Directory>::iterator iter;
+	Directory cur_dir;
+	for (iter = directory.begin(); iter != directory.end(); iter++) {
+		cur_dir = (*iter);
+		free(cur_dir.fcb);
+	}
 	directory.clear();
 	Directory format_directory;
 	strcpy(format_directory.header.name, mbr.space_name);
@@ -182,11 +186,10 @@ int MiniFS::formatSpace(uint_32 cluster_size)
 	format_directory.header.file_num = 0;
 	format_directory.header.create_time = mbr.create_time;
 	format_directory.header.modify_time = time(NULL);
-	format_directory.header.folder_size = sizeof(DFH);
+	format_directory.header.folder_size = 0;
 	format_directory.fcb = (FCB *)calloc(1, sizeof(FCB));
 	newWriteDirectory(format_directory);
 	directory.push_back(format_directory);
-	free(format_directory.fcb);
 
 	// 改写文件缓冲区大小
 	buffer = (char *)realloc(buffer, mbr.cluster_size * 1024);

@@ -39,6 +39,7 @@
 #include <regex>
 #include <sys/stat.h>
 #include <io.h>
+#include <direct.h>
 
 
 #include "mfs_define.h"
