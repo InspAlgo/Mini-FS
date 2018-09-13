@@ -15,6 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mfs_algorithm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mfs_coresystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mfs_define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mini_file_system.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -24,7 +38,13 @@
     <ClCompile Include="mfs_coresystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mfs_cs_cmd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="mfs_cs_diskio.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mfs_cs_fileop.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mfs_cs_help.cpp">
@@ -33,25 +53,5 @@
     <ClCompile Include="mfs_cs_spaceop.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mfs_cs_cmd.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mfs_cs_fileop.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mfs_define.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="mfs_algorithm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="mfs_coresystem.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="mini_file_system.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

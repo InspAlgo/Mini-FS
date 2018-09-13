@@ -42,6 +42,20 @@ bool MfsAlg::BitReset(uint_8 table[], uint_32 size, uint_32 bit_No)
 }
 
 
+/// <summary> 位操作: 检查某位取值 </summary>
+/// <return> 0:该位为0; 1:该位为1; 2:访问越界 </return>
+uint_32 MfsAlg::BitCheck(uint_8 table[], uint_32 size, uint_32 bit_No)
+{
+	if (bit_No >= size) {
+		return 2;
+	}
+	if ((table[bit_No >> 3] & set_mask[bit_No & 7]) != 0){
+		return 1;
+	}
+	else return 0;
+}
+
+
 /// <summary> 位操作: 查找0值位号 </summary>
 /// <return> true:置零成功; 0xffffffff:无空位置 </return>
 uint_32	MfsAlg::BitFindRoom(uint_8 table[], uint_32 size)
@@ -120,44 +134,6 @@ uint_32 MfsAlg::Min(const uint_32 x, const uint_32 y, const uint_32 z)
 }
 
 
-/// <summary> 最小编辑距离算法 </summary>
-/// <return> 字符串source与字符串target的最小编辑距离 </return>
-//uint_32 MfsAlg::LevenDistance(const char source[], const char target[])
-//{
-//	uint_32 len_s = strlen(source);
-//	uint_32 len_t = strlen(target);
-//
-//	if (len_s == 0)		 return len_t;
-//	else if (len_t == 0) return len_s;
-//
-//	// 开辟二维数组 martix[len_t][len_s], 并初始化
-//	uint_32 ** matrix = (uint_32 **)calloc((len_s + 1)*(len_t + 1), sizeof(uint_32));
-//	for (uint_32 i = 1; i <= len_s; i++) {
-//		matrix[i][0] = i;
-//	}
-//	for (uint_32 j = 1; j <= len_t; j++) {
-//		matrix[0][j] = j;
-//	}
-//
-//	// 动态规划计算编辑距离
-//	for (uint_32 i = 1; i <= len_s; i++) {
-//		for (uint_32 j = 1; j <= len_t; j++) {
-//			int cost;
-//			if (source[i - 1] == target[j - 1])
-//				cost = 0;
-//			else
-//				cost = 1;
-//			uint_32 above = matrix[i - 1][j] + 1;
-//			uint_32 left  = matrix[i][j - 1] + 1;
-//			uint_32 diag  = matrix[i - 1][j - 1] + cost;
-//			matrix[i][j]  = Min(above, left, diag);
-//		}
-//	}
-//
-//	return matrix[len_s][len_t];
-//}
-
-
 /// <summary> 分割路径 </summary>
 /// <return> 传入完整路径name[], 依次分割成path向量 </return>
 void MfsAlg::cutPath(char name[], std::vector<std::string> &path) {
@@ -175,5 +151,3 @@ void MfsAlg::cutPath(char name[], std::vector<std::string> &path) {
 	if (cur_path.length())
 		path.push_back(cur_path);
 }
-
-

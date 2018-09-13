@@ -19,6 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mfs_algorithm.h" />
+    <ClInclude Include="mfs_coresystem.h" />
+    <ClInclude Include="mfs_define.h" />
+    <ClInclude Include="mini_file_system.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mfs_algorithm.cpp" />
     <ClCompile Include="mfs_coresystem.cpp" />
@@ -27,12 +33,6 @@
     <ClCompile Include="mfs_cs_fileop.cpp" />
     <ClCompile Include="mfs_cs_help.cpp" />
     <ClCompile Include="mfs_cs_spaceop.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="mfs_algorithm.h" />
-    <ClInclude Include="mfs_coresystem.h" />
-    <ClInclude Include="mfs_define.h" />
-    <ClInclude Include="mini_file_system.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

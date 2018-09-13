@@ -107,6 +107,7 @@ int MiniFS::createSpace(char name[], uint_32 space_size, uint_32 cluster_size)
 	return 1;
 }
 
+
 /// <summary> 打开空间 </summary>
 /// <return> -1:打开失败; 1:打开成功 </return>
 int MiniFS::mountSpace(char name[])
@@ -134,6 +135,7 @@ int MiniFS::mountSpace(char name[])
 
 	return 1;
 }
+
 
 /// <summary> 格式化空间 </summary>
 /// <param name="cluster_size"> 文件系统单簇大小 </param>

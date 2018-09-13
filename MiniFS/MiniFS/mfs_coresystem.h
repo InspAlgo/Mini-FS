@@ -71,15 +71,19 @@ private:
 	int			changeDirectory(char filename[]);
 	int			makeDir(char filename[]);
 	int			createFile(char filename[]);
+	int         findFile(char expression[]);
 	int			copyFile(char filename_1[], char filename_2[]);
 	int         moveFile(char filename_1[], char filename_2[]);
 	int			showAttribute(const char filename[]);
 	int			deleteFile(char filename[]);
+	int			recoverFile(char filename[]);
 	void		showRecycleBin(void);
 	void		emptyRecycleBin(void);
+	void		optimization(void);
 
 	// 有关递归操作函数 
 	void		treeRecur(uint_32 dir_entrance, std::vector<int>& path);
+	void		findRecur(char expression[], uint_32 dir_entrance, std::vector<std::string>& path, bool &empty);
 	void		delRecur(uint_32 dir_entrance);
 	void		showRBRecur(uint_32 dir_entrance, std::vector<std::string>& path, bool &empty, int mode = 0);
 	void		emptyRBRecur(uint_32 dir_entrance);

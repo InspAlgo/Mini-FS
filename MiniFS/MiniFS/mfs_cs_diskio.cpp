@@ -211,4 +211,3 @@ void MiniFS::newWriteDirectory(const Directory dir) const
 	fwrite(&dir_buffer, mbr.cluster_size * 1024, 1, space_fp);
 }
 
-

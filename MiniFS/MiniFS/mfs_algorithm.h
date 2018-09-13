@@ -20,6 +20,9 @@ namespace MfsAlg
 	bool	BitReset(uint_8 table[], uint_32 size, uint_32 bit_No);
 			// 位操作: 查找0值位号
 	uint_32	BitFindRoom(uint_8 table[], uint_32 size);
+			// 位操作: 查找第i位是否为1
+	uint_32 BitCheck(uint_8 table[], uint_32 size, uint_32 bit_No);
+
 
 
 	/// 计算最小值
