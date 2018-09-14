@@ -25,3 +25,14 @@ MiniFS::MiniFS()
 MiniFS::~MiniFS()
 {
 }
+
+void MiniFS::Test_createFile(int file_num)
+{
+    if (file_num < 1)
+        return;
+    for (int i = 1; i < file_num; i++)
+    {
+        std::string file_name = std::to_string(i);
+        this->createFile((char *)file_name.data());
+    }
+}
