@@ -83,12 +83,12 @@ void MiniFS::showHelp(int mode)
 		break;
 
 	case 5:
-		HelpDetail("dr", "dr", "dr 显示当前目录下的文件目录", "");
+		HelpDetail("dr", "dr", "dr 显示当前目录下的文件目录", "dr 显示当前目录下所有文件及文件夹");
 		break;
 
 	case 6:
 		HelpDetail("cp", "cp <name1> <name2>", "用 cp 命令拷贝文件",
-				   "cp wFName sFName 将文件从 Windows 空间中拷贝至 Mini-FS 空间中 \n\t  cp sFName wFName 将文件从 Mini-FS 空间中拷贝至 Windows 空间中 \n\t  cp sFName1 sFName2 将文件从 Mini-FS 空间中拷贝至 Mini-FS 空间中");
+				   "cp wFName sFName 将文件从 Windows 空间中拷贝至 Mini-FS 空间中 \n\t   cp sFName wFName 将文件从 Mini-FS 空间中拷贝至 Windows 空间中 \n\t   cp sFName1 sFName2 将文件从 Mini-FS 空间中拷贝至 Mini-FS 空间中");
 		break;
 
 	case 7:
@@ -97,7 +97,7 @@ void MiniFS::showHelp(int mode)
 		break;
 
 	case 8:
-		HelpDetail("tree", "tree", "用 tree 命令显示目录树", "");
+		HelpDetail("tree", "tree", "用 tree 命令显示目录树", "tree 显示目录树");
 		break;
 
 	case 9:
@@ -112,11 +112,11 @@ void MiniFS::showHelp(int mode)
 
 	case 11:
 		HelpDetail("help", "help [命令名(可选)]", "用 help 命令获取帮助信息",
-				   "help 显示系统名称及含义 \n\t  help create 显示 create 的指令格式等详细信息");
+				   "help 显示系统名称及含义 \n\t   help create 显示 create 的指令格式等详细信息");
 		break;
 
 	case 12:
-		HelpDetail("end", "end", "用 end 命令退出程序", "");
+		HelpDetail("end", "end", "用 end 命令退出程序", "end 退出程序");
 		break;
 
 	case 13:
@@ -130,15 +130,15 @@ void MiniFS::showHelp(int mode)
 		break;
 
 	case 15:
-		HelpDetail("lrb", "lrb", "用 lrb 命令显示回收站内容", "");
+		HelpDetail("lrb", "lrb", "用 lrb 命令显示回收站内容", "lrb 显示回收站内容");
 		break;
 
 	case 16:
-		HelpDetail("crb", "crb", "用 crb 命令清空回收站", "");
+		HelpDetail("crb", "crb", "用 crb 命令清空回收站", "crb 清空回收站");
 		break;
 
 	case 17:
-		HelpDetail("map", "map <filename>", "用 map 命令显示文件使用块号", "");
+		HelpDetail("map", "map <filename>", "用 map 命令显示文件使用块号", "map filename 显示名为 filename 文件的占用的所有块号");
 		break;
 
 	case 18:

@@ -30,10 +30,14 @@ int MiniFS::showDirectory(void)
 		Directory &parent_directory = directory[directory.size() - 2];
 		dir_num += 2;
 		time = gmtime(&current_directory.header.modify_time);
-		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, 8 + time->tm_hour, time->tm_min);
+        if ((8 + time->tm_hour) % 24 != 8 + time->tm_hour)
+            time->tm_mday++;
+		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, (8 + time->tm_hour)%24, time->tm_min);
 		printf("    <DIR>          .\n");
 		time = gmtime(&parent_directory.header.modify_time);
-		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, 8 + time->tm_hour, time->tm_min);
+        if ((8 + time->tm_hour) % 24 != 8 + time->tm_hour)
+            time->tm_mday++;
+		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, (8 + time->tm_hour)%24, time->tm_min);
 		printf("    <DIR>          ..\n");
 	}
 
@@ -42,7 +46,9 @@ int MiniFS::showDirectory(void)
 		if (current_directory.fcb[i].delete_flag == 1)
 			continue;
 		time = gmtime(&current_directory.fcb[i].modify_time);
-		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, 8 + time->tm_hour, time->tm_min);
+        if ((8 + time->tm_hour) % 24 != 8 + time->tm_hour)
+            time->tm_mday++;
+		printf("%04d/%02d/%02d  %02d:%02d", 1900 + time->tm_year, 1 + time->tm_mon, time->tm_mday, (8 + time->tm_hour)%24, time->tm_min);
 		if (current_directory.fcb[i].mark == 1) {
 			printf("%18lld ", current_directory.fcb[i].file_size);
 			file_num++;

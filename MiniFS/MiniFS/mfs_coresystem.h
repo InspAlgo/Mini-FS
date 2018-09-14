@@ -8,7 +8,7 @@
 #pragma once
 #ifndef __MFS_CORESYSTEM_H__
 #define __MFS_CORESYSTEM_H__
-
+// #define SYSTEM_TEST  // 系统测试时所用的宏定义
 
 ///	微型文件系统 (Mini File System)
 class MiniFS
@@ -31,9 +31,9 @@ public:
 	//	命令解析模块			<mfs_cs_cmd.cpp>
 public:
 	int			cmd(void);
+
 private:
 	void		printFilePath(void);
-
 
 	//	帮助系统模块			<mfs_cs_help.cpp>
 private:
@@ -63,7 +63,7 @@ private:
 	int			closeSpace(void);
 
 
-	//	文件操作模块			<mfs_cs_fileop.cpp>
+	//  文件操作模块			<mfs_cs_fileop.cpp>
 private:
 	int			showDirectory(void);
 	void		treeDirectory(void);
@@ -88,9 +88,15 @@ private:
 	void		showRBRecur(uint_32 dir_entrance, std::vector<std::string>& path, bool &empty, int mode = 0);
 	void		emptyRBRecur(uint_32 dir_entrance);
 
+    //  系统测试模块
+#ifdef SYSTEM_TEST
+
+private:
+    void        Test_createFile(int file_num);
+
+#endif 
+
 };
-
-
 
 
 #endif
