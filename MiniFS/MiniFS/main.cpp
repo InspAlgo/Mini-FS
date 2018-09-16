@@ -11,7 +11,7 @@
  *		Member:		Linfeng Li, Runbang Xu, Bole Ma, Chi Zhang, Dalin Miao.
  *		Tutor:		Chunxia Zhang, Shuoying Chen.
  *		Company:	School of Computer Science, Beijing Institute of Technology.
- *		Version:	3.2.12 (Release).
+ *		Version:	3.2.13 (Release).
  *		Submit:		September 11th, 2018.
  *
 **/

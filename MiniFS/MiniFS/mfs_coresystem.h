@@ -8,7 +8,7 @@
 #pragma once
 #ifndef __MFS_CORESYSTEM_H__
 #define __MFS_CORESYSTEM_H__
- #define SYSTEM_TEST  // 系统测试时所用的宏定义
+// #define SYSTEM_TEST  // 系统测试时所用的宏定义
 
 ///	微型文件系统 (Mini File System)
 class MiniFS

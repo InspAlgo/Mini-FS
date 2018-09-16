@@ -16,7 +16,7 @@ MiniFS::MiniFS()
     SetConsoleTitle(L"Mini-FS");
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 
         FOREGROUND_INTENSITY |  FOREGROUND_GREEN | FOREGROUND_BLUE);
-	std::cout << "Mini File System [版本 3.2.12]" << std::endl;
+	std::cout << "Mini File System [版本 3.2.13]" << std::endl;
 	std::cout << "(c) 2018 AlphaBeta。保留所有权利。" << std::endl;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 }
@@ -25,6 +25,8 @@ MiniFS::MiniFS()
 MiniFS::~MiniFS()
 {
 }
+
+#ifdef SYSTEM_TEST
 
 void MiniFS::Test_createFile(int file_num)
 {
@@ -36,3 +38,5 @@ void MiniFS::Test_createFile(int file_num)
         this->createFile((char *)file_name.data());
     }
 }
+
+#endif
