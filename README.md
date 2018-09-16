@@ -1,7 +1,7 @@
 # Mini-FS
 2018小学期-文件系统
 
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)[![GitHub tag](https://img.shields.io/badge/tag-v3.2.13-blue.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/releases)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)  [![GitHub tag](https://img.shields.io/badge/tag-v3.2.13-blue.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/releases)
 
 
 
@@ -392,3 +392,8 @@ fd|查找文件(夹)|fd <name>|fd name 查找 name 文件(夹)
 流程：
 1. 遍历字符串，遇到「\」字符则截断。
 2. 将截断部分放入路径容器中。
+
+
+## 四、协议
+[![LICENSE](./img/MIT.png)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)
+Mini-FS 基于 MIT 协议进行分发和使用，更多信息参见协议文件。
