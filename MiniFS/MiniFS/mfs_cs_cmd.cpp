@@ -539,8 +539,12 @@ int MiniFS::cmd(void)
             std::cout << " 当前没有打开空间!" << std::endl;
             return 1;
         }
+
         if (command_num == 1)
+        {
             this->emptyRecycleBin();
+            std::cout << " 回收站清空完毕!" << std::endl;
+        }
         else
             std::cout << " " << command << " 参数错误!" << std::endl;
     }
@@ -668,7 +672,7 @@ int MiniFS::cmd(void)
                 this->Test_createFile(test_num);
             }
             else
-                std::cout << " " << command_vector << " 无此命令的测试!" << std::endl;
+                std::cout << " " << command_vector[1] << " 无此命令的测试!" << std::endl;
         }
         else
             std::cout << " " << command << " 参数错误!" << std::endl;
