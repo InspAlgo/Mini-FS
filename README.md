@@ -1,9 +1,7 @@
 # Mini-FS
-2018小学期-文件系统
+2018小学期-文件系统  
 
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)  [![GitHub tag](https://img.shields.io/badge/tag-v3.2.13-blue.svg?style=plastic)](https://github.com/InspAlgo/Mini-FS/releases)
-
-
+![](https://img.shields.io/badge/language-C++-orange.svg?style=flat)  [![GitHub tag](https://img.shields.io/badge/tag-v3.2.13-blue.svg?style=flat)](https://github.com/InspAlgo/Mini-FS/releases)  [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)    
 
 ## 一、命令列表
 命令名|功能|格式|示例
@@ -72,8 +70,7 @@ fd|查找文件(夹)|fd <name>|fd name 查找 name 文件(夹)
 
 ### 2.10 容量测试  
 ![](./img/p12.png) 
-向空间里添加外部文件必须使用 cp 命令，移动命令 move 只能对空间内部文件有效。本次空间开 1300M，向其中添加了近 1300M 的文件，结果正常。  
-时间是原文件创建时间，非bug。   
+向空间里添加外部文件必须使用 cp 命令，移动命令 move 只能对空间内部文件有效。本次空间开 1300M，向其中添加了近 1300M 的文件，结果正常。时间是原文件创建时间，非bug。   
 
 ### 测试后记
 如果有朋友在运行本程序后仍然发现有 bug 是正常的，本次测试没有罗列所有的错误报告，只是较为简单的演示程序的可行性。
@@ -395,5 +392,5 @@ fd|查找文件(夹)|fd <name>|fd name 查找 name 文件(夹)
 
 
 ## 四、协议
-[![LICENSE](./img/MIT.png)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)
+[![LICENSE](./img/MIT.png)](https://github.com/InspAlgo/Mini-FS/blob/master/LICENSE)  
 Mini-FS 基于 MIT 协议进行分发和使用，更多信息参见协议文件。
